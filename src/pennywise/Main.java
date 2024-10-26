@@ -24,14 +24,20 @@ public class Main {
     }
 
     private static void showLoginMenu() {
+    	while (true) {
         System.out.println("\n=== PennyWise Login ===");
         System.out.println("1. Login");
         System.out.println("2. Register");
         System.out.println("3. Exit");
         System.out.print("Choose an option: ");
 
-        int choice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        String input = scanner.nextLine().trim();
+     // Refactoring (?), Validate input is a number
+                     if (!input.matches("[1-3]")) {
+                         System.out.println("Error: Please enter a number between 1 and 3");
+                         continue;
+        }
+        int choice = Integer.parseInt(input);
 
         switch (choice) {
             case 1:
@@ -42,11 +48,13 @@ public class Main {
                 break;
             case 3:
                 System.out.println("Thank you for using PennyWise!");
+                scanner.close();
                 System.exit(0);
                 break;
             default:
                 System.out.println("Invalid option. Please try again.");
-        }
+      }
+     }
     }
 
     private static void showMainMenu() {
