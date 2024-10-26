@@ -2,7 +2,10 @@ package pennywise;
 
 import pennywise.app.PennyWise;
 import pennywise.model.*;
+import pennywise.service.TransactionAnalyzer;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
@@ -24,7 +27,6 @@ public class Main {
     }
 
     private static void showLoginMenu() {
-    	while (true) {
         System.out.println("\n=== PennyWise Login ===");
         System.out.println("1. Login");
         System.out.println("2. Register");
@@ -32,10 +34,9 @@ public class Main {
         System.out.print("Choose an option: ");
 
         String input = scanner.nextLine().trim();
-     // Refactoring (?), Validate input is a number
-                     if (!input.matches("[1-3]")) {
-                         System.out.println("Error: Please enter a number between 1 and 3");
-                         continue;
+        if (!input.matches("[1-3]")) {
+            System.out.println("Error: Please enter a number between 1 and 3");
+            return;
         }
         int choice = Integer.parseInt(input);
 
@@ -53,9 +54,8 @@ public class Main {
                 break;
             default:
                 System.out.println("Invalid option. Please try again.");
-      }
-     }
-    }
+        }
+       }
 
     private static void showMainMenu() {
         while (true) {
@@ -63,10 +63,12 @@ public class Main {
             System.out.println("1. Add Expense");
             System.out.println("2. Add Income");
             System.out.println("3. View Transactions");
-            System.out.println("4. Create Budget");
-            System.out.println("5. View Budgets");
-            System.out.println("6. View Balance");
-            System.out.println("7. Logout");
+            System.out.println("4. View Monthly Expenses");
+            System.out.println("5. View Expenses by Category");
+            System.out.println("6. Create Budget");
+            System.out.println("7. View Budgets");
+            System.out.println("8. View Balance");
+            System.out.println("9. Logout");
             System.out.print("Choose an option: ");
 
             int choice = scanner.nextInt();
@@ -83,15 +85,21 @@ public class Main {
                     handleViewTransactions();
                     break;
                 case 4:
-                    handleCreateBudget();
+                    handleViewMonthlyExpenses();
                     break;
                 case 5:
-                    handleViewBudgets();
+                    handleViewExpensesByCategory();
                     break;
                 case 6:
-                    handleViewBalance();
+                    handleCreateBudget();
                     break;
                 case 7:
+                    handleViewBudgets();
+                    break;
+                case 8:
+                    handleViewBalance();
+                    break;
+                case 9:
                     pennywise.logout();
                     return;
                 default:
@@ -217,7 +225,39 @@ public class Main {
             System.out.printf("%s: $%.2f%n", b.getCategory(), b.getAmount());
         }
     }
+    private static void handleViewMonthlyExpenses() {
+        TransactionAnalyzer analyzer = pennywise.getAnalyzer();
+        if (analyzer == null) {
+            System.out.println("Please log in to view monthly expenses.");
+            return;
+        }
 
+        Map<Object, Double> monthlyExpenses = analyzer.getMonthlyExpenses();
+        System.out.println("\n=== Monthly Expenses ===");
+        if (monthlyExpenses.isEmpty()) {
+            System.out.println("No expenses recorded yet.");
+        } else {
+            monthlyExpenses.forEach((month, amount) -> 
+                System.out.printf("%s: $%.2f%n", month, amount));
+        }
+    }
+
+    private static void handleViewExpensesByCategory() {
+        TransactionAnalyzer analyzer = pennywise.getAnalyzer();
+        if (analyzer == null) {
+            System.out.println("Please log in to view expenses by category.");
+            return;
+        }
+
+        Map<Object, Double> categoryExpenses = analyzer.getExpensesByCategory();
+        System.out.println("\n=== Expenses by Category ===");
+        if (categoryExpenses.isEmpty()) {
+            System.out.println("No expenses recorded yet.");
+        } else {
+            categoryExpenses.forEach((category, amount) -> 
+                System.out.printf("%s: $%.2f%n", category, amount));
+        }
+    }
     private static void handleViewBalance() {
         System.out.println("\n=== Financial Summary ===");
         System.out.printf("Total Income: $%.2f%n", pennywise.getTotalIncome());

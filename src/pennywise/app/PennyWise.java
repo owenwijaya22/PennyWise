@@ -4,6 +4,8 @@ import pennywise.interfaces.IDataStorage;
 import pennywise.model.*;
 import pennywise.storage.*;
 import pennywise.service.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.lang.Math;
 
@@ -11,12 +13,14 @@ public class PennyWise {
     private final IDataStorage storage;
     private final BudgetManager budgetManager;
     private final ExpenseTracker expenseTracker;
+    private TransactionAnalyzer analyzer;
     private User currentUser;
 
     public PennyWise(String dataDirectory) {
         this.storage = new FileDataStorage(dataDirectory);
         this.budgetManager = new BudgetManager(storage);
         this.expenseTracker = new ExpenseTracker(storage);
+        this.analyzer = new TransactionAnalyzer(new ArrayList<>());
     }
 
     public boolean login(String userId) {
@@ -117,7 +121,15 @@ public class PennyWise {
         }
         return success;
     }
-
+ // Add this method to get the analyzer
+    public TransactionAnalyzer getAnalyzer() {
+        if (currentUser == null) {
+            return null;
+        }
+        List<Transaction> currentTransactions = getTransactions();
+        analyzer.updateTransactions(currentTransactions);
+        return analyzer;
+    }
     public double getTotalIncome() {
         if (currentUser == null) {
             return 0.0;
@@ -160,4 +172,5 @@ public class PennyWise {
         IDataStorage storage = new FileDataStorage(dataDirectory);
         return storage.clearAllData();
     }
+    
 }

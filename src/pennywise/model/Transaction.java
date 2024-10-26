@@ -19,6 +19,7 @@ public class Transaction implements Serializable {
     }
 
     public String getUserId() { return userId; }
+    
     public double getAmount() { return amount; }
     public String getDescription() { return description; }
     public TransactionType getType() { return type; }
