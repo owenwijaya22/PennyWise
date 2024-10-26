@@ -1,61 +1,41 @@
 package pennywise.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import pennywise.service.BudgetManager;
-import pennywise.service.FinancialGoalPlanner;
+public class User implements Serializable {
+    private final String userId;
+    private final List<Budget> budgets;
+    private final List<Goal> goals;
 
-public class User {
-    private String userID;
-    private String name;
-    private List<Transaction> transactions;
-    private BudgetManager budgetManager;
-    private FinancialGoalPlanner goalPlanner;
-
-    public User(String userID, String name) {
-        this.userID = userID;
-        this.name = name;
-        this.transactions = new ArrayList<>();
-        this.budgetManager = new BudgetManager();
-        this.goalPlanner = new FinancialGoalPlanner();
+    public User(String userId) {
+        this.userId = userId;
+        this.budgets = new ArrayList<>();
+        this.goals = new ArrayList<>();
     }
 
-    public String getUserID() {
-        return userID;
+    public String getUserId() {
+        return userId;
     }
 
-    public String getName() {
-        return name;
+    public List<Budget> getBudgets() {
+        return new ArrayList<>(budgets);
     }
 
-    public void addTransaction(Transaction transaction) {
-        transactions.add(transaction);
+    public void addBudget(Budget budget) {
+        if (budget != null) {
+            budgets.add(budget);
+        }
     }
 
-    public List<Transaction> getTransactions() {
-        return new ArrayList<>(transactions);
-    }
-    
-    public BudgetManager getBudgetManager() {
-        return budgetManager;
+    public List<Goal> getGoals() {
+        return new ArrayList<>(goals);
     }
 
-    public FinancialGoalPlanner getGoalPlanner() {
-        return goalPlanner;
-    }
-
-    public float calculateTotalSpendings() {
-        return (float) transactions.stream()
-            .filter(t -> t instanceof Expense)
-            .mapToDouble(Transaction::getAmount)
-            .sum();
-    }
-
-    public float calculateTotalIncome() {
-        return (float) transactions.stream()
-            .filter(t -> t instanceof Income)
-            .mapToDouble(Transaction::getAmount)
-            .sum();
+    public void addGoal(Goal goal) {
+        if (goal != null) {
+            goals.add(goal);
+        }
     }
 }

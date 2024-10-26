@@ -1,134 +1,145 @@
 package pennywise.storage;
 
-import java.io.*;
-import java.util.List;
-import java.util.ArrayList;
 import pennywise.interfaces.IDataStorage;
-import pennywise.model.User;
-import pennywise.model.Transaction;
+import pennywise.model.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileDataStorage implements IDataStorage {
-    private final String DATA_DIR = "data/";
-    private final String USERS_FILE = DATA_DIR + "users.dat";
-    private final String TRANSACTIONS_DIR = DATA_DIR + "transactions/";
+    private final String dataDirectory;
+    private static final String USERS_FILE = "users.dat";
+    private static final String TRANSACTIONS_FILE = "transactions.dat";
 
-    public FileDataStorage() {
-        initializeDataDirectories();
+    public FileDataStorage(String dataDirectory) {
+        this.dataDirectory = dataDirectory;
+        initializeDirectory();
     }
 
-    private void initializeDataDirectories() {
-        new File(DATA_DIR).mkdirs();
-        new File(TRANSACTIONS_DIR).mkdirs();
-    }
-
-    @Override
-    public void saveData(List<User> users) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(USERS_FILE))) {
-            oos.writeObject(users);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to save users data", e);
+    private void initializeDirectory() {
+        File directory = new File(dataDirectory);
+        if (!directory.exists()) {
+            directory.mkdirs();
         }
     }
 
     @Override
     public List<User> loadData() {
-        File file = new File(USERS_FILE);
+        File file = new File(dataDirectory, USERS_FILE);
         if (!file.exists()) {
             return new ArrayList<>();
         }
 
-        try (ObjectInputStream ois = new ObjectInputStream(
-                new FileInputStream(USERS_FILE))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             return (List<User>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Failed to load users data", e);
+        } catch (Exception e) {
+            return new ArrayList<>();
         }
+    }
+
+    @Override
+    public void saveData(List<User> users) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(new File(dataDirectory, USERS_FILE)))) {
+            oos.writeObject(users);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public User loadUser(String userID) {
+        List<User> users = loadData();
+        return users.stream()
+                   .filter(u -> u.getUserId().equals(userID))
+                   .findFirst()
+                   .orElse(null);
     }
 
     @Override
     public boolean saveUser(User user) {
         List<User> users = loadData();
-        users.removeIf(u -> u.getUserID().equals(user.getUserID()));
+        users.removeIf(u -> u.getUserId().equals(user.getUserId()));
         users.add(user);
-        saveData(users);
-        return true;
-    }
-
-    @Override
-    public User loadUser(String userID) {
-        return loadData().stream()
-                .filter(u -> u.getUserID().equals(userID))
-                .findFirst()
-                .orElse(null);
-    }
-
-    @Override
-    public boolean saveTransaction(String userID, Transaction transaction) {
-        String filename = TRANSACTIONS_DIR + userID + ".dat";
-        List<Transaction> transactions = loadTransactions(userID);
-        transactions.add(transaction);
-        
-        try (ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(filename))) {
-            oos.writeObject(transactions);
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    @Override
-    public List<Transaction> loadTransactions(String userID) {
-        String filename = TRANSACTIONS_DIR + userID + ".dat";
-        File file = new File(filename);
-        
-        if (!file.exists()) {
-            return new ArrayList<>();
-        }
-
-        try (ObjectInputStream ois = new ObjectInputStream(
-                new FileInputStream(filename))) {
-            return (List<Transaction>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public boolean deleteUser(String userID) {
-        List<User> users = loadData();
-        boolean removed = users.removeIf(u -> u.getUserID().equals(userID));
-        if (removed) {
-            saveData(users);
-            new File(TRANSACTIONS_DIR + userID + ".dat").delete();
-        }
-        return removed;
-    }
-
-    @Override
-    public boolean clearAllData() {
         try {
-            File dataDir = new File(DATA_DIR);
-            deleteDirectory(dataDir);
-            initializeDataDirectories();
+            saveData(users);
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    private void deleteDirectory(File directory) {
-        File[] files = directory.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    deleteDirectory(file);
-                } else {
+    @Override
+    public boolean deleteUser(String userID) {
+        List<User> users = loadData();
+        boolean removed = users.removeIf(u -> u.getUserId().equals(userID));
+        if (removed) {
+            try {
+                saveData(users);
+                // Also delete user's transaction file
+                File transactionFile = new File(dataDirectory, userID + "_" + TRANSACTIONS_FILE);
+                if (transactionFile.exists()) {
+                    transactionFile.delete();
+                }
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean clearAllData() {
+        try {
+            // Delete users file
+            File usersFile = new File(dataDirectory, USERS_FILE);
+            if (usersFile.exists()) {
+                usersFile.delete();
+            }
+
+            // Delete all transaction files
+            File directory = new File(dataDirectory);
+            File[] files = directory.listFiles((dir, name) -> name.endsWith(TRANSACTIONS_FILE));
+            if (files != null) {
+                for (File file : files) {
                     file.delete();
                 }
             }
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-        directory.delete();
+    }
+
+    @Override
+    public boolean saveTransaction(String userId, Transaction transaction) {
+        List<Transaction> transactions = loadTransactions(userId);
+        transactions.add(transaction);
+        return saveAllTransactions(userId, transactions);
+    }
+
+    @Override
+    public List<Transaction> loadTransactions(String userId) {
+        File file = new File(dataDirectory, userId + "_" + TRANSACTIONS_FILE);
+        if (!file.exists()) {
+            return new ArrayList<>();
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            return (List<Transaction>) ois.readObject();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    private boolean saveAllTransactions(String userId, List<Transaction> transactions) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(new File(dataDirectory, userId + "_" + TRANSACTIONS_FILE)))) {
+            oos.writeObject(transactions);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

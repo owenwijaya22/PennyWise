@@ -1,231 +1,163 @@
 package pennywise.app;
 
+import pennywise.interfaces.IDataStorage;
 import pennywise.model.*;
-import pennywise.utils.DiscountManager;
-import pennywise.interfaces.*;
-import java.util.ArrayList;
+import pennywise.storage.*;
+import pennywise.service.*;
 import java.util.List;
-import java.util.UUID;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.Date;
+import java.lang.Math;
 
 public class PennyWise {
-    private List<User> users;
-    private IDataStorage dataStorage;
-    private Scanner scanner;
-    private String currentUserID;
+    private final IDataStorage storage;
+    private final BudgetManager budgetManager;
+    private final ExpenseTracker expenseTracker;
+    private User currentUser;
 
-    public PennyWise(IDataStorage dataStorage) {
-        this.users = new ArrayList<>();
-        this.dataStorage = dataStorage;
-        this.scanner = new Scanner(System.in);
+    public PennyWise(String dataDirectory) {
+        this.storage = new FileDataStorage(dataDirectory);
+        this.budgetManager = new BudgetManager(storage);
+        this.expenseTracker = new ExpenseTracker(storage);
     }
 
-    // Existing methods
-    public String createUser(String name) {
-        String userID = UUID.randomUUID().toString();
-        User user = new User(userID, name);
-        users.add(user);
-        return userID;
-    }
-
-    public Optional<User> getUser(String userID) {
-        return users.stream()
-            .filter(u -> u.getUserID().equals(userID))
-            .findFirst();
-    }
-
-    public void addTransaction(String userID, Transaction transaction) {
-        getUser(userID).ifPresent(user -> user.addTransaction(transaction));
-    }
-
-    public void setUserBudget(String userID, float amount) {
-        getUser(userID).ifPresent(user -> user.getBudgetManager().createBudget(userID, amount));
-    }
-
-    // Main application loop
-    public void start() {
-        boolean running = true;
-        while (running) {
-            if (currentUserID == null) {
-                showLoginMenu();
-            } else {
-                showMainMenu();
-            }
+    public boolean login(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return false;
         }
-    }
 
-    private void showLoginMenu() {
-        System.out.println("\n=== PennyWise ===");
-        System.out.println("1. Login");
-        System.out.println("2. Create Account");
-        System.out.println("3. Exit");
-        
-        int choice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-
-        switch (choice) {
-            case 1:
-                handleLogin();
-                break;
-            case 2:
-                handleCreateAccount();
-                break;
-            case 3:
-                System.exit(0);
-                break;
-            default:
-                System.out.println("Invalid choice");
+        User user = storage.loadUser(userId);
+        if (user != null) {
+            currentUser = user;
+            return true;
         }
+        return false;
     }
 
-    private void showMainMenu() {
-        System.out.println("\n=== Main Menu ===");
-        System.out.println("1. Add Income");
-        System.out.println("2. Add Expense");
-        System.out.println("3. View Balance");
-        System.out.println("4. Set Budget");
-        System.out.println("5. Logout");
-
-        int choice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
-
-        switch (choice) {
-            case 1:
-                handleAddIncome();
-                break;
-            case 2:
-                handleAddExpense();
-                break;
-            case 3:
-                handleViewBalance();
-                break;
-            case 4:
-                handleSetBudget();
-                break;
-            case 5:
-                handleLogout();
-                break;
-            default:
-                System.out.println("Invalid choice");
+    public boolean registerUser(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return false;
         }
-    }
 
-    private void handleLogin() {
-        System.out.print("Enter user ID: ");
-        String userID = scanner.nextLine();
-        
-        if (getUser(userID).isPresent()) {
-            currentUserID = userID;
-            System.out.println("Login successful!");
-        } else {
-            System.out.println("User not found!");
+        // Check if user already exists
+        if (storage.loadUser(userId) != null) {
+            return false;
         }
+
+        User newUser = new User(userId);
+        boolean success = storage.saveUser(newUser);
+        // Don't automatically log in after registration
+        return success;
     }
 
-    private void handleCreateAccount() {
-        System.out.print("Enter your name: ");
-        String name = scanner.nextLine();
-        
-        String userID = createUser(name);
-        System.out.println("Account created! Your user ID is: " + userID);
-        System.out.println("Please save this ID for login");
-    }
-
-    private float getUserTotalIncome(String userID) {
-        Optional<User> user = getUser(userID);
-        if (user.isPresent()) {
-            return user.get().getTransactions().stream()
-                .filter(t -> t instanceof Income)
-                .map(Transaction::getAmount)
-                .reduce(0f, Float::sum);
+    public boolean deleteAccount() {
+        if (currentUser == null) {
+            return false;
         }
-        return 0f;
-    }
-
-    private float getUserTotalSpendings(String userID) {
-        Optional<User> user = getUser(userID);
-        if (user.isPresent()) {
-            return user.get().getTransactions().stream()
-                .filter(t -> t instanceof Expense)
-                .map(Transaction::getAmount)
-                .reduce(0f, Float::sum);
+        boolean deleted = storage.deleteUser(currentUser.getUserId());
+        if (deleted) {
+            logout();
         }
-        return 0f;
-    }
-    
-    
-    private void handleAddIncome() {
-        System.out.print("Enter amount: ");
-        float amount = scanner.nextFloat();
-        scanner.nextLine(); // Consume newline
-        
-        Income income = new Income(new Date(), amount, IncomeCategory.OTHER);
-        addTransaction(currentUserID, income);
-        System.out.println("Income added successfully!");
+        return deleted;
     }
 
-    private void handleAddExpense() {
-        System.out.print("Enter amount: ");
-        float amount = scanner.nextFloat();
-        scanner.nextLine(); // Consume newline
-        
-        Expense expense = new Expense(new Date(), amount, ExpenseCategory.OTHER);
-        addTransaction(currentUserID, expense);
-        System.out.println("Expense added successfully!");
+    public boolean addExpense(double amount, String description, ExpenseCategory category) {
+        if (currentUser == null || amount <= 0 || description == null || description.trim().isEmpty()) {
+            return false;
+        }
+        return expenseTracker.addExpense(currentUser.getUserId(), amount, description, category);
     }
 
-    private void handleViewBalance() {
-        float totalIncome = getUserTotalIncome(currentUserID);
-        float totalExpense = getUserTotalSpendings(currentUserID);
-        float balance = totalIncome - totalExpense;
-        
-        System.out.println("\nFinancial Summary:");
-        System.out.println("Total Income: $" + totalIncome);
-        System.out.println("Total Expense: $" + totalExpense);
-        System.out.println("Current Balance: $" + balance);
+    public boolean addIncome(double amount, String description, IncomeCategory category) {
+        if (currentUser == null || amount <= 0 || description == null || description.trim().isEmpty()) {
+            return false;
+        }
+        return expenseTracker.addIncome(currentUser.getUserId(), amount, description, category);
     }
 
-    private void handleSetBudget() {
-        System.out.print("Enter budget amount: ");
-        float amount = scanner.nextFloat();
-        scanner.nextLine(); // Consume newline
-        
-        setUserBudget(currentUserID, amount);
-        System.out.println("Budget set successfully!");
+    public boolean createBudget(String category, double amount) {
+        if (currentUser == null || amount < 0 || category == null || category.trim().isEmpty()) {
+            return false;
+        }
+        return budgetManager.createBudget(currentUser.getUserId(), category, amount);
     }
 
-    private void handleLogout() {
-        currentUserID = null;
-        System.out.println("Logged out successfully!");
+    public List<Transaction> getTransactions() {
+        if (currentUser == null) {
+            return List.of();
+        }
+        return expenseTracker.getTransactions(currentUser.getUserId());
     }
 
-    // Main method
-    public static void main(String[] args) {
-        // Simple in-memory storage implementation
-        IDataStorage storage = new IDataStorage() {
-            private List<User> users = new ArrayList<>();
-
-            public void saveData(List<User> users) {
-                this.users = users;
-            }
-
-            public List<User> loadData() {
-                return users;
-            }
-
-            // Implement other methods with empty returns
-            public boolean saveUser(User user) { return true; }
-            public User loadUser(String userID) { return null; }
-            public boolean saveTransaction(String userID, Transaction transaction) { return true; }
-            public List<Transaction> loadTransactions(String userID) { return new ArrayList<>(); }
-            public boolean deleteUser(String userID) { return true; }
-            public boolean clearAllData() { return true; }
-        };
-
-        PennyWise app = new PennyWise(storage);
-        app.start();
+    public List<Budget> getBudgets() {
+        if (currentUser == null) {
+            return List.of();
+        }
+        return budgetManager.getBudgets(currentUser.getUserId());
     }
-    
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void logout() {
+        currentUser = null;
+    }
+
+    public boolean isLoggedIn() {
+        return currentUser != null;
+    }
+
+    public boolean updateUserProfile(User updatedUser) {
+        if (currentUser == null || updatedUser == null || 
+            !currentUser.getUserId().equals(updatedUser.getUserId())) {
+            return false;
+        }
+        boolean success = storage.saveUser(updatedUser);
+        if (success) {
+            currentUser = updatedUser;
+        }
+        return success;
+    }
+
+    public double getTotalIncome() {
+        if (currentUser == null) {
+            return 0.0;
+        }
+        return expenseTracker.getTransactions(currentUser.getUserId()).stream()
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+    }
+
+    public double getTotalExpenses() {
+        if (currentUser == null) {
+            return 0.0;
+        }
+        return expenseTracker.getTransactions(currentUser.getUserId()).stream()
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .mapToDouble(t -> Math.abs(t.getAmount()))
+                .sum();
+    }
+
+    public double getCurrentBalance() {
+        if (currentUser == null) {
+            return 0.0;
+        }
+        return expenseTracker.getTransactions(currentUser.getUserId()).stream()
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+    }
+
+    public boolean clearAllUserData() {
+        if (currentUser == null) {
+            return false;
+        }
+        String userId = currentUser.getUserId();
+        logout();
+        return storage.deleteUser(userId);
+    }
+
+    public static boolean resetApplication(String dataDirectory) {
+        IDataStorage storage = new FileDataStorage(dataDirectory);
+        return storage.clearAllData();
+    }
 }
