@@ -33,6 +33,10 @@ public class User {
         transactions.add(transaction);
     }
 
+    public List<Transaction> getTransactions() {
+        return new ArrayList<>(transactions);
+    }
+    
     public BudgetManager getBudgetManager() {
         return budgetManager;
     }
