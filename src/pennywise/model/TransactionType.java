@@ -1,6 +1,6 @@
+// TransactionType.java
 package pennywise.model;
 
 public enum TransactionType {
-    EXPENSE,
-    INCOME
+    INCOME, EXPENSE
 }

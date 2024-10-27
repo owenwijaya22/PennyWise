@@ -1,9 +1,22 @@
+// IncomeCategory.java
 package pennywise.model;
 
-public enum IncomeCategory {
+import pennywise.interfaces.TransactionCategory;
+
+public enum IncomeCategory implements TransactionCategory {
     SALARY,
     BUSINESS,
     INVESTMENT,
     GIFT,
-    OTHER
+    OTHER;
+
+    @Override
+    public String getCategoryName() {
+        return this.name();
+    }
+
+    @Override
+    public TransactionType getTransactionType() {
+        return TransactionType.INCOME;
+    }
 }

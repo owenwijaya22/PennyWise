@@ -2,6 +2,8 @@ package pennywise.service;
 
 import pennywise.model.*;
 import pennywise.interfaces.IDataStorage;
+import pennywise.interfaces.TransactionCategory;
+
 import java.util.List;
 
 public class ExpenseTracker {
@@ -11,15 +13,14 @@ public class ExpenseTracker {
         this.storage = storage;
     }
 
-    public boolean addExpense(String userId, double amount, String description, ExpenseCategory category) {
+    public boolean addTransaction(String userId, double amount, TransactionCategory category) {
         if (amount <= 0) return false;
-        Transaction transaction = new Transaction(userId, -amount, description, TransactionType.EXPENSE);
-        return storage.saveTransaction(userId, transaction);
-    }
-
-    public boolean addIncome(String userId, double amount, String description, IncomeCategory category) {
-        if (amount <= 0) return false;
-        Transaction transaction = new Transaction(userId, amount, description, TransactionType.INCOME);
+        Transaction transaction = new Transaction(
+            userId, 
+            amount, 
+            category.getTransactionType(), 
+            category
+        );
         return storage.saveTransaction(userId, transaction);
     }
 

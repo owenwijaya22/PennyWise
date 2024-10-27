@@ -1,6 +1,7 @@
 package pennywise;
 
 import pennywise.interfaces.IDataStorage;
+import pennywise.interfaces.TransactionCategory;
 import pennywise.model.*;
 import pennywise.storage.*;
 import pennywise.service.*;
@@ -63,20 +64,6 @@ public class PennyWise {
             logout();
         }
         return deleted;
-    }
-
-    public boolean addExpense(double amount, String description, ExpenseCategory category) {
-        if (currentUser == null || amount <= 0 || description == null || description.trim().isEmpty()) {
-            return false;
-        }
-        return expenseTracker.addExpense(currentUser.getUserId(), amount, description, category);
-    }
-
-    public boolean addIncome(double amount, String description, IncomeCategory category) {
-        if (currentUser == null || amount <= 0 || description == null || description.trim().isEmpty()) {
-            return false;
-        }
-        return expenseTracker.addIncome(currentUser.getUserId(), amount, description, category);
     }
 
     public boolean createBudget(String category, double amount) {
@@ -227,12 +214,15 @@ public class PennyWise {
             System.out.println("2. Add Income");
             System.out.println("3. View Transactions");
             System.out.println("4. View Monthly Expenses");
-            System.out.println("5. View Expenses by Category");
-            System.out.println("6. Create Budget");
-            System.out.println("7. View Budgets");
-            System.out.println("8. View Balance");
-            System.out.println("9. View Discounts");
-            System.out.println("10. Logout");
+            System.out.println("5. View Monthly Incomes");
+            System.out.println("6. View Incomes by Category");
+            System.out.println("7. View Expenses by Category");
+            System.out.println("8. View Incomes by Category");
+            System.out.println("9. Create Budget");
+            System.out.println("10. View Budgets");
+            System.out.println("11. View Balance");
+            System.out.println("12. View Discounts");
+            System.out.println("13. Logout");
             System.out.print("Choose an option: ");
 
             int choice = scanner.nextInt();
@@ -251,22 +241,28 @@ public class PennyWise {
                 case 4:
                     handleViewMonthlyExpenses();
                     break;
-                case 5:
-                    handleViewExpensesByCategory();
-                    break;
+				case 5:
+					handleViewMonthlyIncomes();
+					break;
                 case 6:
-                    handleCreateBudget();
+                	handleViewIncomesByCategory();
                     break;
                 case 7:
-                    handleViewBudgets();
-                    break;
+                    handleViewExpensesByCategory();
+					break;
                 case 8:
-                    handleViewBalance();
+                    handleCreateBudget();
                     break;
                 case 9:
-                    handleDiscountVisualization();
+                    handleViewBudgets();
                     break;
                 case 10:
+                    handleViewBalance();
+                    break;
+                case 11:
+                    handleDiscountVisualization();
+                    break;
+                case 12:
                     logout();
                     return;
                 default:
@@ -297,14 +293,21 @@ public class PennyWise {
         }
     }
 
+
+    public boolean addTransaction(double amount, TransactionCategory category) {
+        if (currentUser == null || amount <= 0) {
+            return false;
+        }
+        return expenseTracker.addTransaction(currentUser.getUserId(), amount, category);
+    }
+
+
     private void handleAddExpense() {
         System.out.print("Enter amount: ");
         double amount = scanner.nextDouble();
         scanner.nextLine();
 
-        System.out.print("Enter description: ");
-        String description = scanner.nextLine();
-
+        // Handle discount
         System.out.print("Do you have a discount code? (Y/N): ");
         String hasDiscount = scanner.nextLine().trim().toUpperCase();
         
@@ -319,7 +322,6 @@ public class PennyWise {
                 double discountAmount = amount * (discount.getPercentage() / 100);
                 amount -= discountAmount;
                 System.out.printf("Discount applied: -$%.2f (%.0f%%)%n", discountAmount, discount.getPercentage());
-                description += String.format(" (Discount: %s)", discountCode);
             } else {
                 System.out.println("Invalid or expired discount code.");
             }
@@ -328,13 +330,13 @@ public class PennyWise {
         System.out.println("Select category:");
         ExpenseCategory[] categories = ExpenseCategory.values();
         for (int i = 0; i < categories.length; i++) {
-            System.out.println((i + 1) + ". " + categories[i]);
+            System.out.println((i + 1) + ". " + categories[i].getCategoryName());
         }
         int categoryChoice = scanner.nextInt() - 1;
         scanner.nextLine();
 
         if (categoryChoice >= 0 && categoryChoice < categories.length) {
-            if (addExpense(amount, description, categories[categoryChoice])) {
+            if (addTransaction(amount, categories[categoryChoice])) {
                 System.out.println("Expense added successfully!");
             } else {
                 System.out.println("Failed to add expense.");
@@ -344,33 +346,30 @@ public class PennyWise {
         }
     }
 
-    private void handleAddIncome() {
-        System.out.print("Enter amount: ");
-        double amount = scanner.nextDouble();
-        scanner.nextLine();
 
-        System.out.print("Enter description: ");
-        String description = scanner.nextLine();
+private void handleAddIncome() {
+    System.out.print("Enter amount: ");
+    double amount = scanner.nextDouble();
+    scanner.nextLine();
 
-        System.out.println("Select category:");
-        IncomeCategory[] categories = IncomeCategory.values();
-        for (int i = 0; i < categories.length; i++) {
-            System.out.println((i + 1) + ". " + categories[i]);
-        }
-        int categoryChoice = scanner.nextInt() - 1;
-        scanner.nextLine();
-
-        if (categoryChoice >= 0 && categoryChoice < categories.length) {
-            if (addIncome(amount, description, categories[categoryChoice])) {
-                System.out.println("Income added successfully!");
-            } else {
-                System.out.println("Failed to add income.");
-            }
-        } else {
-            System.out.println("Invalid category selection.");
-        }
+    System.out.println("Select category:");
+    IncomeCategory[] categories = IncomeCategory.values();
+    for (int i = 0; i < categories.length; i++) {
+        System.out.println((i + 1) + ". " + categories[i].getCategoryName());
     }
+    int categoryChoice = scanner.nextInt() - 1;
+    scanner.nextLine();
 
+    if (categoryChoice >= 0 && categoryChoice < categories.length) {
+        if (addTransaction(amount, categories[categoryChoice])) {
+            System.out.println("Income added successfully!");
+        } else {
+            System.out.println("Failed to add income.");
+        }
+    } else {
+        System.out.println("Invalid category selection.");
+    }
+}
     private void handleViewTransactions() {
         List<Transaction> transactions = getTransactions();
         if (transactions.isEmpty()) {
@@ -380,8 +379,9 @@ public class PennyWise {
 
         System.out.println("\n=== Transactions ===");
         for (Transaction t : transactions) {
-            System.out.printf("%s: $%.2f - %s (%s)%n",
-                    t.getType(), t.getAmount(), t.getDescription(), t.getDate());
+            System.out.printf("%s: $%.2f from %s (%s)%n",
+                    t.getType(), Math.abs(t.getAmount()), 
+                    t.getCategory().getCategoryName(), t.getDate());
         }
     }
 
@@ -429,6 +429,22 @@ public class PennyWise {
                 System.out.printf("%s: $%.2f%n", month, amount));
         }
     }
+    
+    private void handleViewMonthlyIncomes() {
+		TransactionAnalyzer analyzer = getAnalyzer();
+		if (analyzer == null) {
+			System.out.println("Please log in to view monthly incomes.");
+			return;
+		}
+
+		Map<Object, Double> monthlyIncomes = analyzer.getMonthlyIncome();
+		System.out.println("\n=== Monthly Incomes ===");
+		if (monthlyIncomes.isEmpty()) {
+			System.out.println("No expenses recorded yet.");
+		} else {
+			monthlyIncomes.forEach((month, amount) -> System.out.printf("%s: $%.2f%n", month, amount));
+		}
+    }
 
     private void handleViewExpensesByCategory() {
         TransactionAnalyzer analyzer = getAnalyzer();
@@ -443,6 +459,23 @@ public class PennyWise {
             System.out.println("No expenses recorded yet.");
         } else {
             categoryExpenses.forEach((category, amount) -> 
+                System.out.printf("%s: $%.2f%n", category, amount));
+        }
+    }
+    
+    private void handleViewIncomesByCategory() {
+    	TransactionAnalyzer analyzer = getAnalyzer();
+        if (analyzer == null) {
+            System.out.println("Please log in to view incomes by category.");
+            return;
+        }
+
+        Map<Object, Double> categoryIncomes = analyzer.getIncomeByCategory();
+        System.out.println("\n=== Incomes by Category ===");
+        if (categoryIncomes.isEmpty()) {
+            System.out.println("No expenses recorded yet.");
+        } else {
+        	categoryIncomes.forEach((category, amount) -> 
                 System.out.printf("%s: $%.2f%n", category, amount));
         }
     }
