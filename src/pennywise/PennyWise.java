@@ -1,34 +1,195 @@
 package pennywise;
 
-import pennywise.app.PennyWise;
+import pennywise.interfaces.IDataStorage;
 import pennywise.model.*;
-import pennywise.service.TransactionAnalyzer;
+import pennywise.storage.*;
+import pennywise.service.*;
 import pennywise.utils.DiscountManager;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Main {
-    private static PennyWise pennywise;
+public class PennyWise {
+    private final IDataStorage storage;
+    private final BudgetManager budgetManager;
+    private final ExpenseTracker expenseTracker;
+    private TransactionAnalyzer analyzer;
+    private User currentUser;
     private static Scanner scanner;
 
-    public static void main(String[] args) {
-        // Initialize the application with a data directory
-        pennywise = new PennyWise("./pennywise_data");
+    public PennyWise(String dataDirectory) {
+        this.storage = new FileDataStorage(dataDirectory);
+        this.budgetManager = new BudgetManager(storage);
+        this.expenseTracker = new ExpenseTracker(storage);
+        this.analyzer = new TransactionAnalyzer(new ArrayList<>());
         scanner = new Scanner(System.in);
+    }
+
+    public boolean login(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return false;
+        }
+
+        User user = storage.loadUser(userId);
+        if (user != null) {
+            currentUser = user;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean registerUser(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            return false;
+        }
+
+        if (storage.loadUser(userId) != null) {
+            return false;
+        }
+
+        User newUser = new User(userId);
+        return storage.saveUser(newUser);
+    }
+
+    public boolean deleteAccount() {
+        if (currentUser == null) {
+            return false;
+        }
+        boolean deleted = storage.deleteUser(currentUser.getUserId());
+        if (deleted) {
+            logout();
+        }
+        return deleted;
+    }
+
+    public boolean addExpense(double amount, String description, ExpenseCategory category) {
+        if (currentUser == null || amount <= 0 || description == null || description.trim().isEmpty()) {
+            return false;
+        }
+        return expenseTracker.addExpense(currentUser.getUserId(), amount, description, category);
+    }
+
+    public boolean addIncome(double amount, String description, IncomeCategory category) {
+        if (currentUser == null || amount <= 0 || description == null || description.trim().isEmpty()) {
+            return false;
+        }
+        return expenseTracker.addIncome(currentUser.getUserId(), amount, description, category);
+    }
+
+    public boolean createBudget(String category, double amount) {
+        if (currentUser == null || amount < 0 || category == null || category.trim().isEmpty()) {
+            return false;
+        }
+        return budgetManager.createBudget(currentUser.getUserId(), category, amount);
+    }
+
+    public List<Transaction> getTransactions() {
+        if (currentUser == null) {
+            return List.of();
+        }
+        return expenseTracker.getTransactions(currentUser.getUserId());
+    }
+
+    public List<Budget> getBudgets() {
+        if (currentUser == null) {
+            return List.of();
+        }
+        return budgetManager.getBudgets(currentUser.getUserId());
+    }
+
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void logout() {
+        currentUser = null;
+    }
+
+    public boolean isLoggedIn() {
+        return currentUser != null;
+    }
+
+    public boolean updateUserProfile(User updatedUser) {
+        if (currentUser == null || updatedUser == null || 
+            !currentUser.getUserId().equals(updatedUser.getUserId())) {
+            return false;
+        }
+        boolean success = storage.saveUser(updatedUser);
+        if (success) {
+            currentUser = updatedUser;
+        }
+        return success;
+    }
+
+    public TransactionAnalyzer getAnalyzer() {
+        if (currentUser == null) {
+            return null;
+        }
+        List<Transaction> currentTransactions = getTransactions();
+        analyzer.updateTransactions(currentTransactions);
+        return analyzer;
+    }
+
+    public double getTotalIncome() {
+        if (currentUser == null) {
+            return 0.0;
+        }
+        return expenseTracker.getTransactions(currentUser.getUserId()).stream()
+                .filter(t -> t.getType() == TransactionType.INCOME)
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+    }
+
+    public double getTotalExpenses() {
+        if (currentUser == null) {
+            return 0.0;
+        }
+        return expenseTracker.getTransactions(currentUser.getUserId()).stream()
+                .filter(t -> t.getType() == TransactionType.EXPENSE)
+                .mapToDouble(t -> Math.abs(t.getAmount()))
+                .sum();
+    }
+
+    public double getCurrentBalance() {
+        if (currentUser == null) {
+            return 0.0;
+        }
+        return expenseTracker.getTransactions(currentUser.getUserId()).stream()
+                .mapToDouble(Transaction::getAmount)
+                .sum();
+    }
+
+    public boolean clearAllUserData() {
+        if (currentUser == null) {
+            return false;
+        }
+        String userId = currentUser.getUserId();
+        logout();
+        return storage.deleteUser(userId);
+    }
+
+    public static boolean resetApplication(String dataDirectory) {
+        IDataStorage storage = new FileDataStorage(dataDirectory);
+        return storage.clearAllData();
+    }
+
+    // Main application entry point and CLI methods
+    public static void main(String[] args) {
+        PennyWise pennywise = new PennyWise("./pennywise_data");
 
         while (true) {
             if (!pennywise.isLoggedIn()) {
-                showLoginMenu();
+                pennywise.showLoginMenu();
             } else {
-                showMainMenu();
+                pennywise.showMainMenu();
             }
         }
     }
 
-    private static void showLoginMenu() {
+    private void showLoginMenu() {
         System.out.println("\n=== PennyWise Login ===");
         System.out.println("1. Login");
         System.out.println("2. Register");
@@ -57,9 +218,9 @@ public class Main {
             default:
                 System.out.println("Invalid option. Please try again.");
         }
-       }
+    }
 
-    private static void showMainMenu() {
+    private void showMainMenu() {
         while (true) {
             System.out.println("\n=== PennyWise Main Menu ===");
             System.out.println("1. Add Expense");
@@ -70,8 +231,8 @@ public class Main {
             System.out.println("6. Create Budget");
             System.out.println("7. View Budgets");
             System.out.println("8. View Balance");
-            System.out.println("9. View Discounts");  // New option
-            System.out.println("10. Logout");         // Moved to 10
+            System.out.println("9. View Discounts");
+            System.out.println("10. Logout");
             System.out.print("Choose an option: ");
 
             int choice = scanner.nextInt();
@@ -103,47 +264,47 @@ public class Main {
                     handleViewBalance();
                     break;
                 case 9:
-                    handleDiscountVisualization();    // New case
+                    handleDiscountVisualization();
                     break;
-                case 10:                             // Changed to 10
-                    pennywise.logout();
+                case 10:
+                    logout();
                     return;
                 default:
                     System.out.println("Invalid option. Please try again.");
             }
         }
     }
-    private static void handleLogin() {
+
+    private void handleLogin() {
         System.out.print("Enter user ID: ");
         String userId = scanner.nextLine();
         
-        if (pennywise.login(userId)) {
+        if (login(userId)) {
             System.out.println("Login successful!");
         } else {
             System.out.println("Login failed. User not found. Please register first.");
         }
     }
 
-    private static void handleRegistration() {
+    private void handleRegistration() {
         System.out.print("Enter new user ID: ");
         String userId = scanner.nextLine();
         
-        if (pennywise.registerUser(userId)) {
+        if (registerUser(userId)) {
             System.out.println("Registration successful! Please login to continue.");
         } else {
             System.out.println("Registration failed. User ID might already exist.");
         }
     }
 
-    private static void handleAddExpense() {
+    private void handleAddExpense() {
         System.out.print("Enter amount: ");
         double amount = scanner.nextDouble();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         System.out.print("Enter description: ");
         String description = scanner.nextLine();
 
-        // Add discount handling
         System.out.print("Do you have a discount code? (Y/N): ");
         String hasDiscount = scanner.nextLine().trim().toUpperCase();
         
@@ -170,10 +331,10 @@ public class Main {
             System.out.println((i + 1) + ". " + categories[i]);
         }
         int categoryChoice = scanner.nextInt() - 1;
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         if (categoryChoice >= 0 && categoryChoice < categories.length) {
-            if (pennywise.addExpense(amount, description, categories[categoryChoice])) {
+            if (addExpense(amount, description, categories[categoryChoice])) {
                 System.out.println("Expense added successfully!");
             } else {
                 System.out.println("Failed to add expense.");
@@ -183,10 +344,10 @@ public class Main {
         }
     }
 
-    private static void handleAddIncome() {
+    private void handleAddIncome() {
         System.out.print("Enter amount: ");
         double amount = scanner.nextDouble();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         System.out.print("Enter description: ");
         String description = scanner.nextLine();
@@ -197,10 +358,10 @@ public class Main {
             System.out.println((i + 1) + ". " + categories[i]);
         }
         int categoryChoice = scanner.nextInt() - 1;
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         if (categoryChoice >= 0 && categoryChoice < categories.length) {
-            if (pennywise.addIncome(amount, description, categories[categoryChoice])) {
+            if (addIncome(amount, description, categories[categoryChoice])) {
                 System.out.println("Income added successfully!");
             } else {
                 System.out.println("Failed to add income.");
@@ -210,8 +371,8 @@ public class Main {
         }
     }
 
-    private static void handleViewTransactions() {
-        List<Transaction> transactions = pennywise.getTransactions();
+    private void handleViewTransactions() {
+        List<Transaction> transactions = getTransactions();
         if (transactions.isEmpty()) {
             System.out.println("No transactions found.");
             return;
@@ -224,23 +385,23 @@ public class Main {
         }
     }
 
-    private static void handleCreateBudget() {
+    private void handleCreateBudget() {
         System.out.print("Enter budget category: ");
         String category = scanner.nextLine();
 
         System.out.print("Enter budget amount: ");
         double amount = scanner.nextDouble();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
-        if (pennywise.createBudget(category, amount)) {
+        if (createBudget(category, amount)) {
             System.out.println("Budget created successfully!");
         } else {
             System.out.println("Failed to create budget.");
         }
     }
 
-    private static void handleViewBudgets() {
-        List<Budget> budgets = pennywise.getBudgets();
+    private void handleViewBudgets() {
+        List<Budget> budgets = getBudgets();
         if (budgets.isEmpty()) {
             System.out.println("No budgets found.");
             return;
@@ -251,8 +412,9 @@ public class Main {
             System.out.printf("%s: $%.2f%n", b.getCategory(), b.getAmount());
         }
     }
-    private static void handleViewMonthlyExpenses() {
-        TransactionAnalyzer analyzer = pennywise.getAnalyzer();
+
+    private void handleViewMonthlyExpenses() {
+        TransactionAnalyzer analyzer = getAnalyzer();
         if (analyzer == null) {
             System.out.println("Please log in to view monthly expenses.");
             return;
@@ -268,8 +430,8 @@ public class Main {
         }
     }
 
-    private static void handleViewExpensesByCategory() {
-        TransactionAnalyzer analyzer = pennywise.getAnalyzer();
+    private void handleViewExpensesByCategory() {
+        TransactionAnalyzer analyzer = getAnalyzer();
         if (analyzer == null) {
             System.out.println("Please log in to view expenses by category.");
             return;
@@ -284,13 +446,15 @@ public class Main {
                 System.out.printf("%s: $%.2f%n", category, amount));
         }
     }
-    private static void handleViewBalance() {
+
+    private void handleViewBalance() {
         System.out.println("\n=== Financial Summary ===");
-        System.out.printf("Total Income: $%.2f%n", pennywise.getTotalIncome());
-        System.out.printf("Total Expenses: $%.2f%n", pennywise.getTotalExpenses());
-        System.out.printf("Current Balance: $%.2f%n", pennywise.getCurrentBalance());
+        System.out.printf("Total Income: $%.2f%n", getTotalIncome());
+        System.out.printf("Total Expenses: $%.2f%n", getTotalExpenses());
+        System.out.printf("Current Balance: $%.2f%n", getCurrentBalance());
     }
-    private static void handleDiscountVisualization() {
+
+    private void handleDiscountVisualization() {
         DiscountManager discountManager = DiscountManager.getInstance();
         
         while (true) {
@@ -301,7 +465,7 @@ public class Main {
             System.out.println("4. Return to Main Menu");
             
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Clear buffer
+            scanner.nextLine();
             
             switch (choice) {
                 case 1:
@@ -320,7 +484,8 @@ public class Main {
             }
         }
     }
-    private static void addCustomDiscount(DiscountManager discountManager) {
+
+    private void addCustomDiscount(DiscountManager discountManager) {
         System.out.println("\n=== Add Custom Discount ===");
         
         System.out.print("Enter discount code: ");
@@ -328,7 +493,7 @@ public class Main {
         
         System.out.print("Enter discount percentage (without % symbol): ");
         float percentage = scanner.nextFloat();
-        scanner.nextLine(); // Clear buffer
+        scanner.nextLine();
         
         System.out.print("Enter description: ");
         String description = scanner.nextLine();
@@ -336,9 +501,8 @@ public class Main {
         System.out.println("\nExpiry date:");
         System.out.print("Enter days from now: ");
         int days = scanner.nextInt();
-        scanner.nextLine(); // Clear buffer
+        scanner.nextLine();
         
-        // Calculate expiry date
         Date expiryDate = new Date(System.currentTimeMillis() + (long)days * 24 * 60 * 60 * 1000);
         
         Discount newDiscount = new Discount(code, percentage, expiryDate, description);
@@ -347,7 +511,7 @@ public class Main {
         System.out.println("\nDiscount added successfully!");
     }
 
-    private static void addPredeterminedDiscount(DiscountManager discountManager) {
+    private void addPredeterminedDiscount(DiscountManager discountManager) {
         System.out.println("\n=== Predetermined Discounts ===");
         System.out.println("1. Apple Student Discount");
         System.out.println("2. Octopus Student Discount");
@@ -358,9 +522,8 @@ public class Main {
         System.out.println("7. Return");
         
         int choice = scanner.nextInt();
-        scanner.nextLine(); // Clear buffer
+        scanner.nextLine();
         
-        // Set expiry date to 365 days from now for annual discounts
         Date defaultExpiry = new Date(System.currentTimeMillis() + 365L * 24 * 60 * 60 * 1000);
         
         Discount selectedDiscount = null;
@@ -426,7 +589,7 @@ public class Main {
         }
     }
 
-    private static void displayDiscounts(List<Discount> discounts) {
+    private void displayDiscounts(List<Discount> discounts) {
         if (discounts.isEmpty()) {
             System.out.println("\nNo discounts available currently.");
             return;
@@ -438,7 +601,6 @@ public class Main {
             boolean isValid = discount.isValid();
             String status = isValid ? "\u001B[32m▣ ACTIVE\u001B[0m" : "\u001B[31m▢ EXPIRED\u001B[0m";
             
-            // Calculate days remaining or days expired
             long diffInMillies = discount.getExpiryDate().getTime() - System.currentTimeMillis();
             long diffInDays = diffInMillies / (24 * 60 * 60 * 1000);
             
@@ -446,7 +608,6 @@ public class Main {
                 String.format("\u001B[32m%d days remaining\u001B[0m", diffInDays) :
                 String.format("\u001B[31mExpired %d days ago\u001B[0m", Math.abs(diffInDays));
 
-            // Create visual percentage bar
             int barLength = 20;
             int filledBars = (int)((discount.getPercentage() / 100) * barLength);
             String percentageBar = "█".repeat(Math.min(filledBars, barLength)) + 
@@ -462,7 +623,6 @@ public class Main {
 
         System.out.println("╚═══════════════════════════════════════════════════════════╝");
         
-        // Show quick stats
         long activeCount = discounts.stream().filter(Discount::isValid).count();
         double avgDiscount = discounts.stream()
             .filter(Discount::isValid)
