@@ -8,7 +8,8 @@ public class DiscountManager {
     private static DiscountManager instance;
     private List<Discount> discounts;
     
-    private DiscountManager() {
+    // changed from public to protected to allow mock test stubs
+    protected DiscountManager() {
         discounts = new ArrayList<>();
     }
     
@@ -20,7 +21,12 @@ public class DiscountManager {
     }
     
     public void addDiscount(Discount discount) {
-        discounts.add(discount);
+        if (discounts.stream().noneMatch(d -> d.getCode().equals(discount.getCode()))) {
+            discounts.add(discount);
+            System.out.println("Discount added successfully!");
+        } else {
+            System.out.println("Discount code already exists. Please use a unique code.");
+        }
     }
     
     public List<Discount> getAvailableDiscounts() {
