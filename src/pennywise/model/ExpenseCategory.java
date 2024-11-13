@@ -1,4 +1,4 @@
-// IncomeCategory.java
+// ExpenseCategory.java
 package pennywise.model;
 
 import pennywise.interfaces.TransactionCategory;
@@ -6,6 +6,7 @@ import pennywise.interfaces.TransactionCategory;
 public enum ExpenseCategory implements TransactionCategory {
     FOOD,
     TRANSPORTATION,
+    UTILITIES,
     SHOPPING,
     BILLS,
     ENTERTAINMENT,
