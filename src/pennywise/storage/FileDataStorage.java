@@ -16,11 +16,23 @@ public class FileDataStorage implements IDataStorage {
         this.dataDirectory = dataDirectory;
         initializeDirectory();
     }
-
+    
+    // OLD CODE
+//    private void initializeDirectory() {
+//        File directory = new File(dataDirectory);
+//        if (!directory.exists()) {
+//            directory.mkdirs();
+//        }
+//    }
+    
+    // NEW CODE
     private void initializeDirectory() {
         File directory = new File(dataDirectory);
         if (!directory.exists()) {
-            directory.mkdirs();
+            boolean created = directory.mkdirs();
+            if (!created) {
+                throw new RuntimeException("Failed to create directory: " + dataDirectory);
+            }
         }
     }
 
@@ -37,14 +49,33 @@ public class FileDataStorage implements IDataStorage {
             return new ArrayList<>();
         }
     }
-
+    
+    // OLD CODE
+//    @Override
+//    public void saveData(List<User> users) {
+//        try (ObjectOutputStream oos = new ObjectOutputStream(
+//                new FileOutputStream(new File(dataDirectory, USERS_FILE)))) {
+//            oos.writeObject(users);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+    
+    // NEW CODE
     @Override
     public void saveData(List<User> users) {
+        File file = new File(dataDirectory, USERS_FILE);
+        File parent = file.getParentFile();
+        if (!parent.exists()) {
+            parent.mkdirs();
+        }
+        
         try (ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(new File(dataDirectory, USERS_FILE)))) {
+                new FileOutputStream(file))) {
             oos.writeObject(users);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to save data: " + e.getMessage());
         }
     }
 
