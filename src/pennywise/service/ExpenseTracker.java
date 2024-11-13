@@ -13,7 +13,7 @@ public class ExpenseTracker {
         this.storage = storage;
     }
 
-    public boolean addTransaction(String userId, double amount, TransactionCategory category) {
+    public synchronized boolean addTransaction(String userId, double amount, TransactionCategory category) {
         if (amount <= 0) return false;
         Transaction transaction = new Transaction(
             userId, 
