@@ -23,4 +23,10 @@ public enum ExpenseCategory implements TransactionCategory {
     public TransactionType getTransactionType() {
         return TransactionType.EXPENSE;
     }
+    
+    
+    @Override
+    public double processAmount(double amount) {
+        return -amount;  		
+    }			
 }

@@ -19,4 +19,9 @@ public enum IncomeCategory implements TransactionCategory {
     public TransactionType getTransactionType() {
         return TransactionType.INCOME;
     }
+    
+    @Override
+    public double processAmount(double amount) {
+        return amount;  		
+    }
 }

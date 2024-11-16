@@ -14,7 +14,7 @@ public class Transaction implements Serializable {
 
     public Transaction(String userId, double amount, TransactionType type, TransactionCategory category) {
         this.userId = userId;
-        this.amount = type == TransactionType.EXPENSE ? -Math.abs(amount) : Math.abs(amount);
+        this.amount = category.processAmount(amount);
         this.type = type;
         this.category = category;
         this.date = new Date();
