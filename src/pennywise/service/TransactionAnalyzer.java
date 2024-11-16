@@ -1,3 +1,4 @@
+// TransactionAnalyzer.java
 package pennywise.service;
 
 import pennywise.model.*;
@@ -17,37 +18,36 @@ public class TransactionAnalyzer {
         this.transactions = new ArrayList<>(newTransactions);
     }
 
-    public Map<Object, Double> getMonthlyExpenses() {
+    public Map<String, Double> getMonthlyExpenses() {
         return transactions.stream()
-            .filter(t -> t.getType() == TransactionType.EXPENSE)
+            .filter(Transaction::isExpense)
             .collect(Collectors.groupingBy(
                 t -> new SimpleDateFormat("MMMM yyyy").format(t.getDate()),
                 Collectors.summingDouble(t -> Math.abs(t.getAmount()))
             ));
     }
 
-    public Map<Object, Double> getExpensesByCategory() {
+    public Map<TransactionCategory, Double> getExpensesByCategory() {
         return transactions.stream()
-            .filter(t -> t.getType() == TransactionType.EXPENSE)
+            .filter(Transaction::isExpense)
             .collect(Collectors.groupingBy(
                 Transaction::getCategory,
                 Collectors.summingDouble(t -> Math.abs(t.getAmount()))
             ));
     }
 
-    // Additional helper methods for analysis
-    public Map<Object, Double> getIncomeByCategory() {
+    public Map<TransactionCategory, Double> getIncomeByCategory() {
         return transactions.stream()
-            .filter(t -> t.getType() == TransactionType.INCOME)
+            .filter(t -> !t.isExpense())
             .collect(Collectors.groupingBy(
                 Transaction::getCategory,
                 Collectors.summingDouble(Transaction::getAmount)
             ));
     }
 
-    public Map<Object, Double> getMonthlyIncome() {
+    public Map<String, Double> getMonthlyIncome() {
         return transactions.stream()
-            .filter(t -> t.getType() == TransactionType.INCOME)
+            .filter(t -> !t.isExpense())
             .collect(Collectors.groupingBy(
                 t -> new SimpleDateFormat("MMMM yyyy").format(t.getDate()),
                 Collectors.summingDouble(Transaction::getAmount)
@@ -56,21 +56,29 @@ public class TransactionAnalyzer {
 
     public double getTotalExpenses() {
         return transactions.stream()
-            .filter(t -> t.getType() == TransactionType.EXPENSE)
+            .filter(Transaction::isExpense)
             .mapToDouble(t -> Math.abs(t.getAmount()))
             .sum();
     }
 
     public double getTotalIncome() {
         return transactions.stream()
-            .filter(t -> t.getType() == TransactionType.INCOME)
+            .filter(t -> !t.isExpense())
             .mapToDouble(Transaction::getAmount)
             .sum();
     }
 
-    public Map<Object, Double> getCategoryPercentages(TransactionType type) {
-        double total = type == TransactionType.EXPENSE ? getTotalExpenses() : getTotalIncome();
-        Map<Object, Double> categoryAmounts = type == TransactionType.EXPENSE ? 
+    public double getNetAmount() {
+        return transactions.stream()
+            .mapToDouble(Transaction::getAmount)
+            .sum();
+    }
+
+    public Map<TransactionCategory, Double> getCategoryPercentages(boolean isExpense) {
+        double total = isExpense ? getTotalExpenses() : getTotalIncome();
+        if (total == 0) return new HashMap<>();
+        
+        Map<TransactionCategory, Double> categoryAmounts = isExpense ? 
             getExpensesByCategory() : getIncomeByCategory();
 
         return categoryAmounts.entrySet().stream()

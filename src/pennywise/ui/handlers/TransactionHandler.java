@@ -5,6 +5,7 @@ import pennywise.model.*;
 import pennywise.service.TransactionAnalyzer;
 import pennywise.ui.UIConstants;
 import pennywise.utils.DiscountManager;
+import pennywise.interfaces.TransactionCategory;
 
 import java.util.*;
 
@@ -17,10 +18,38 @@ public class TransactionHandler {
         this.inputHandler = inputHandler;
     }
 
+    private <T extends Enum<T> & TransactionCategory> T handleCategorySelection(Class<T> categoryClass) {
+        System.out.println(UIConstants.SELECT_CATEGORY_PROMPT);
+        T[] categories = categoryClass.getEnumConstants();
+        for (int i = 0; i < categories.length; i++) {
+            System.out.println((i + 1) + ". " + categories[i].getCategoryName());
+        }
+        int categoryChoice = inputHandler.readInt() - 1;
+
+        if (categoryChoice >= 0 && categoryChoice < categories.length) {
+            return categories[categoryChoice];
+        }
+        return null;
+    }
+
+    private boolean handleTransaction(double amount, TransactionCategory category, boolean isExpense) {
+        if (category == null) {
+            System.out.println(UIConstants.INVALID_CATEGORY_MESSAGE);
+            return false;
+        }
+
+        if (pennywise.addTransaction(amount, category)) {
+            System.out.println(isExpense ? UIConstants.EXPENSE_SUCCESS_MESSAGE : UIConstants.INCOME_SUCCESS_MESSAGE);
+            return true;
+        } else {
+            System.out.println(isExpense ? UIConstants.EXPENSE_FAILED_MESSAGE : UIConstants.INCOME_FAILED_MESSAGE);
+            return false;
+        }
+    }
+
     void handleAddExpense() {
         System.out.print(UIConstants.ENTER_AMOUNT_PROMPT);
         double amount = inputHandler.readDouble();
-        System.out.println(amount);
         if (amount < 0) {
             System.out.println(UIConstants.INVALID_NUMBER_MESSAGE);
             return;
@@ -42,22 +71,8 @@ public class TransactionHandler {
             }
         }
 
-        System.out.println(UIConstants.SELECT_CATEGORY_PROMPT);
-        ExpenseCategory[] categories = ExpenseCategory.values();
-        for (int i = 0; i < categories.length; i++) {
-            System.out.println((i + 1) + ". " + categories[i].getCategoryName());
-        }
-        int categoryChoice = inputHandler.readInt() - 1;
-
-        if (categoryChoice >= 0 && categoryChoice < categories.length) {
-            if (pennywise.addTransaction(amount, categories[categoryChoice])) {
-                System.out.println(UIConstants.EXPENSE_SUCCESS_MESSAGE);
-            } else {
-                System.out.println(UIConstants.EXPENSE_FAILED_MESSAGE);
-            }
-        } else {
-            System.out.println(UIConstants.INVALID_CATEGORY_MESSAGE);
-        }
+        TransactionCategory category = handleCategorySelection(ExpenseCategory.class);
+        handleTransaction(amount, category, true);
     }
 
     void handleAddIncome() {
@@ -68,22 +83,8 @@ public class TransactionHandler {
             return;
         }
         
-        System.out.println(UIConstants.SELECT_CATEGORY_PROMPT);
-        IncomeCategory[] categories = IncomeCategory.values();
-        for (int i = 0; i < categories.length; i++) {
-            System.out.println((i + 1) + ". " + categories[i].getCategoryName());
-        }
-        int categoryChoice = inputHandler.readInt() - 1;
-
-        if (categoryChoice >= 0 && categoryChoice < categories.length) {
-            if (pennywise.addTransaction(amount, categories[categoryChoice])) {
-                System.out.println(UIConstants.INCOME_SUCCESS_MESSAGE);
-            } else {
-                System.out.println(UIConstants.INCOME_FAILED_MESSAGE);
-            }
-        } else {
-            System.out.println(UIConstants.INVALID_CATEGORY_MESSAGE);
-        }
+        TransactionCategory category = handleCategorySelection(IncomeCategory.class);
+        handleTransaction(amount, category, false);
     }
 
     void handleViewTransactions() {
@@ -95,8 +96,9 @@ public class TransactionHandler {
 
         System.out.println(UIConstants.TRANSACTIONS_TITLE);
         for (Transaction t : transactions) {
+            String transactionType = t.isExpense() ? "EXPENSE" : "INCOME";
             System.out.printf(UIConstants.TRANSACTION_FORMAT,
-                    t.getType(), Math.abs(t.getAmount()), 
+                    transactionType, Math.abs(t.getAmount()), 
                     t.getCategory().getCategoryName(), t.getDate());
         }
     }
@@ -108,7 +110,7 @@ public class TransactionHandler {
             return;
         }
 
-        Map<Object, Double> monthlyExpenses = analyzer.getMonthlyExpenses();
+        Map<String, Double> monthlyExpenses = analyzer.getMonthlyExpenses();
         System.out.println(UIConstants.MONTHLY_EXPENSES_TITLE);
         if (monthlyExpenses.isEmpty()) {
             System.out.println(UIConstants.NO_EXPENSES_MESSAGE);
@@ -119,19 +121,20 @@ public class TransactionHandler {
     }
 
     void handleViewMonthlyIncomes() {
-		TransactionAnalyzer analyzer = pennywise.getAnalyzer();
-		if (analyzer == null) {
-			System.out.println(UIConstants.LOGIN_PROMPT_MONTHLY_EXPENSES);
-			return;
-		}
+        TransactionAnalyzer analyzer = pennywise.getAnalyzer();
+        if (analyzer == null) {
+            System.out.println(UIConstants.LOGIN_PROMPT_MONTHLY_EXPENSES);
+            return;
+        }
 
-		Map<Object, Double> monthlyIncomes = analyzer.getMonthlyIncome();
-		System.out.println(UIConstants.MONTHLY_INCOMES_TITLE);
-		if (monthlyIncomes.isEmpty()) {
-			System.out.println(UIConstants.NO_INCOMES_MESSAGE);
-		} else {
-			monthlyIncomes.forEach((month, amount) -> System.out.printf(UIConstants.CATEGORY_AMOUNT_FORMAT, month, amount));
-		}
+        Map<String, Double> monthlyIncomes = analyzer.getMonthlyIncome();
+        System.out.println(UIConstants.MONTHLY_INCOMES_TITLE);
+        if (monthlyIncomes.isEmpty()) {
+            System.out.println(UIConstants.NO_INCOMES_MESSAGE);
+        } else {
+            monthlyIncomes.forEach((month, amount) -> 
+                System.out.printf(UIConstants.CATEGORY_AMOUNT_FORMAT, month, amount));
+        }
     }
 
     void handleViewExpensesByCategory() {
@@ -141,30 +144,30 @@ public class TransactionHandler {
             return;
         }
 
-        Map<Object, Double> categoryExpenses = analyzer.getExpensesByCategory();
+        Map<TransactionCategory, Double> categoryExpenses = analyzer.getExpensesByCategory();
         System.out.println(UIConstants.EXPENSES_CATEGORY_TITLE);
         if (categoryExpenses.isEmpty()) {
             System.out.println(UIConstants.NO_EXPENSES_MESSAGE);
         } else {
             categoryExpenses.forEach((category, amount) -> 
-                System.out.printf(UIConstants.CATEGORY_AMOUNT_FORMAT, category, amount));
+                System.out.printf(UIConstants.CATEGORY_AMOUNT_FORMAT, category.getCategoryName(), amount));
         }
     }
 
     void handleViewIncomesByCategory() {
-    	TransactionAnalyzer analyzer = pennywise.getAnalyzer();
+        TransactionAnalyzer analyzer = pennywise.getAnalyzer();
         if (analyzer == null) {
             System.out.println(UIConstants.LOGIN_PROMPT_INCOMES_CATEGORY);
             return;
         }
 
-        Map<Object, Double> categoryIncomes = analyzer.getIncomeByCategory();
+        Map<TransactionCategory, Double> categoryIncomes = analyzer.getIncomeByCategory();
         System.out.println(UIConstants.MONTHLY_INCOMES_TITLE);
         if (categoryIncomes.isEmpty()) {
             System.out.println(UIConstants.NO_INCOMES_MESSAGE);
         } else {
-        	categoryIncomes.forEach((category, amount) -> 
-                System.out.printf(UIConstants.CATEGORY_AMOUNT_FORMAT, category, amount));
+            categoryIncomes.forEach((category, amount) -> 
+                System.out.printf(UIConstants.CATEGORY_AMOUNT_FORMAT, category.getCategoryName(), amount));
         }
     }
 

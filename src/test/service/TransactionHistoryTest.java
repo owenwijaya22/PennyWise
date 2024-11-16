@@ -23,7 +23,7 @@ public class TransactionHistoryTest {
         // 2. Verifying transaction count
         // 3. Confirming transaction details match
         
-        Transaction transaction = new Transaction(TEST_USER_ID, 100.0, TransactionType.EXPENSE, ExpenseCategory.FOOD);
+        Transaction transaction = new Transaction(TEST_USER_ID, 100.0, ExpenseCategory.FOOD);
         history.addTransaction(transaction);
         
         List<Transaction> transactions = history.getTransactionHistory();
@@ -39,8 +39,8 @@ public class TransactionHistoryTest {
         // 2. Verifying transaction count
         // 3. Confirming transaction order
         
-        Transaction expense = new Transaction(TEST_USER_ID, 100.0, TransactionType.EXPENSE, ExpenseCategory.FOOD);
-        Transaction income = new Transaction(TEST_USER_ID, 1000.0, TransactionType.INCOME, IncomeCategory.SALARY);
+        Transaction expense = new Transaction(TEST_USER_ID, 100.0, ExpenseCategory.FOOD);
+        Transaction income = new Transaction(TEST_USER_ID, 1000.0, IncomeCategory.SALARY);
         
         history.addTransaction(expense);
         history.addTransaction(income);
@@ -59,7 +59,7 @@ public class TransactionHistoryTest {
         // 2. Attempting to modify returned list
         // 3. Verifying original list remains unchanged
         
-        Transaction transaction = new Transaction(TEST_USER_ID, 100.0, TransactionType.EXPENSE, ExpenseCategory.FOOD);
+        Transaction transaction = new Transaction(TEST_USER_ID, 100.0, ExpenseCategory.FOOD);
         history.addTransaction(transaction);
         
         List<Transaction> transactions = history.getTransactionHistory();
