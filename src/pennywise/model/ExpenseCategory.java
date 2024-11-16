@@ -4,15 +4,7 @@ package pennywise.model;
 import pennywise.interfaces.TransactionCategory;
 
 public enum ExpenseCategory implements TransactionCategory {
-    FOOD,
-    TRANSPORTATION,
-    UTILITIES,
-    SHOPPING,
-    BILLS,
-    ENTERTAINMENT,
-    HEALTH,
-    OTHER;
-	
+    FOOD, TRANSPORTATION, UTILITIES, SHOPPING, BILLS, ENTERTAINMENT, HEALTH, OTHER;
 
     @Override
     public String getCategoryName() {
@@ -20,13 +12,12 @@ public enum ExpenseCategory implements TransactionCategory {
     }
 
     @Override
-    public TransactionType getTransactionType() {
-        return TransactionType.EXPENSE;
+    public double processAmount(double amount) {
+        return -Math.abs(amount);  // Expense is always negative
     }
     
-    
     @Override
-    public double processAmount(double amount) {
-        return -amount;  		
-    }			
+    public boolean isExpenseCategory() {
+        return true;
+    }		
 }

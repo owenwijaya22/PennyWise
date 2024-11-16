@@ -13,14 +13,9 @@ public class TransactionManager {
         this.storage = storage;
     }
 
-    public synchronized boolean addTransaction(String userId, double amount, TransactionCategory category) {
+    public boolean addTransaction(String userId, double amount, TransactionCategory category) {
         if (amount <= 0) return false;
-        Transaction transaction = new Transaction(
-            userId, 
-            amount, 
-            category.getTransactionType(), 
-            category
-        );
+        Transaction transaction = new Transaction(userId, amount, category);
         return storage.saveTransaction(userId, transaction);
     }
 

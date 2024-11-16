@@ -4,11 +4,7 @@ package pennywise.model;
 import pennywise.interfaces.TransactionCategory;
 
 public enum IncomeCategory implements TransactionCategory {
-    SALARY,
-    BUSINESS,
-    INVESTMENT,
-    GIFT,
-    OTHER;
+    SALARY, BUSINESS, INVESTMENT, GIFT, OTHER;
 
     @Override
     public String getCategoryName() {
@@ -16,12 +12,12 @@ public enum IncomeCategory implements TransactionCategory {
     }
 
     @Override
-    public TransactionType getTransactionType() {
-        return TransactionType.INCOME;
+    public double processAmount(double amount) {
+        return Math.abs(amount);  // Income is always positive
     }
     
     @Override
-    public double processAmount(double amount) {
-        return amount;  		
-    }
+    public boolean isExpenseCategory() {
+        return false;
+    }		
 }

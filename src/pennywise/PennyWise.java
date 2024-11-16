@@ -15,7 +15,7 @@ public class PennyWise {
     private final IDataStorage storage;
     private final AuthenticationService authService;
     private final BudgetManager budgetManager;
-    private final TransactionManager TransactionManager;
+    private final TransactionManager transactionManager;
     private TransactionAnalyzer analyzer;
     private ConsoleUI ui;
 
@@ -23,7 +23,7 @@ public class PennyWise {
         this.storage = new FileDataStorage(dataDirectory);
         this.authService = new AuthenticationService(storage);
         this.budgetManager = new BudgetManager(storage);
-        this.TransactionManager = new TransactionManager(storage);
+        this.transactionManager = new TransactionManager(storage);
         this.analyzer = new TransactionAnalyzer(new ArrayList<>());
         this.ui = new ConsoleUI(this);
     }
@@ -32,7 +32,7 @@ public class PennyWise {
         this.storage = storage;
         this.authService = new AuthenticationService(storage);
         this.budgetManager = budgetManager;
-        this.TransactionManager = new TransactionManager(storage);
+        this.transactionManager = new TransactionManager(storage);
         this.analyzer = analyzer;
     }
 
@@ -41,7 +41,7 @@ public class PennyWise {
         pennywise.ui.start();
     }
 
-    // Authentication methods 
+    // Authentication methods remain unchanged
     public boolean login(String userId) {
         return authService.login(userId);
     }
@@ -58,14 +58,13 @@ public class PennyWise {
         return authService.getCurrentUser() != null;
     }
 
-    // Transaction methods
-    public synchronized boolean addTransaction(double amount, TransactionCategory category) {
+    public  boolean addTransaction(double amount, TransactionCategory category) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null || amount <= 0) {
             return false;
         }
 
-        if (category.getTransactionType() == TransactionType.EXPENSE) {
+        if (category.isExpenseCategory()) {
             double monthlyBudget = budgetManager.getCurrentMonthBudget(currentUser.getUserId());
             if (monthlyBudget > 0) {
                 double currentMonthExpenses = getTotalExpenses();
@@ -74,7 +73,8 @@ public class PennyWise {
                 }
             }
         }
-        return TransactionManager.addTransaction(currentUser.getUserId(), amount, category);
+        
+        return transactionManager.addTransaction(currentUser.getUserId(), amount, category);
     }
 
     public List<Transaction> getTransactions() {
@@ -82,10 +82,9 @@ public class PennyWise {
         if (currentUser == null) {
             return List.of();
         }
-        return TransactionManager.getTransactions(currentUser.getUserId());
+        return transactionManager.getTransactions(currentUser.getUserId());
     }
 
-    // Budget methods
     public boolean createBudget(double amount) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null || amount < 0) {
@@ -102,7 +101,7 @@ public class PennyWise {
         return budgetManager.updateBudget(currentUser.getUserId(), amount);
     }
 
-    // Analysis methods
+    // Modified Analysis methods
     public TransactionAnalyzer getAnalyzer() {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null) {
@@ -118,8 +117,8 @@ public class PennyWise {
         if (currentUser == null) {
             return 0.0;
         }
-        return TransactionManager.getTransactions(currentUser.getUserId()).stream()
-                .filter(t -> t.getType() == TransactionType.INCOME)
+        return transactionManager.getTransactions(currentUser.getUserId()).stream()
+                .filter(t -> t.getAmount() > 0)
                 .mapToDouble(Transaction::getAmount)
                 .sum();
     }
@@ -130,8 +129,8 @@ public class PennyWise {
             return 0.0;
         }
         YearMonth currentMonth = YearMonth.now();
-        return TransactionManager.getTransactions(currentUser.getUserId()).stream()
-            .filter(t -> t.getType() == TransactionType.EXPENSE)
+        return transactionManager.getTransactions(currentUser.getUserId()).stream()
+            .filter(t -> t.getAmount() < 0)
             .filter(t -> {
                 YearMonth transactionMonth = YearMonth.from(t.getDate().toInstant()
                     .atZone(ZoneId.systemDefault())
@@ -147,12 +146,12 @@ public class PennyWise {
         if (currentUser == null) {
             return 0.0;
         }
-        return TransactionManager.getTransactions(currentUser.getUserId()).stream()
+        return transactionManager.getTransactions(currentUser.getUserId()).stream()
                 .mapToDouble(Transaction::getAmount)
                 .sum();
     }
 
-    // Account management methods
+    // Account management methods remain unchanged
     public boolean deleteAccount() {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null) {
