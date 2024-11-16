@@ -9,7 +9,7 @@ import pennywise.service.TransactionManager;
 
 import java.util.List;
 
-public class ExpenseTrackerTest {
+public class TransactionManagerTest {
     private TransactionManager expenseTracker;
     private IDataStorage mockStorage;
     private static final String TEST_USER_ID = "testUser";
