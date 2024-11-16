@@ -5,19 +5,19 @@ import org.junit.jupiter.api.*;
 import pennywise.model.*;
 import pennywise.interfaces.*;
 import test.stubs.MockDataStorage;
-import pennywise.service.ExpenseTracker;
+import pennywise.service.TransactionManager;
 
 import java.util.List;
 
 public class ExpenseTrackerTest {
-    private ExpenseTracker expenseTracker;
+    private TransactionManager expenseTracker;
     private IDataStorage mockStorage;
     private static final String TEST_USER_ID = "testUser";
 
     @BeforeEach
     void setUp() {
         mockStorage = new MockDataStorage();
-        expenseTracker = new ExpenseTracker(mockStorage);
+        expenseTracker = new TransactionManager(mockStorage);
     }
 
     @Test

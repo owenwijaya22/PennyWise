@@ -6,10 +6,10 @@ import pennywise.interfaces.TransactionCategory;
 
 import java.util.List;
 
-public class ExpenseTracker {
+public class TransactionManager {
     private final IDataStorage storage;
 
-    public ExpenseTracker(IDataStorage storage) {
+    public TransactionManager(IDataStorage storage) {
         this.storage = storage;
     }
 
