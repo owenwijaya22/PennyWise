@@ -15,7 +15,7 @@ public class PennyWise {
     private final IDataStorage storage;
     private final AuthenticationService authService;
     private final BudgetManager budgetManager;
-    private final ExpenseTracker expenseTracker;
+    private final TransactionManager expenseTracker;
     private TransactionAnalyzer analyzer;
     private ConsoleUI ui;
 
@@ -23,7 +23,7 @@ public class PennyWise {
         this.storage = new FileDataStorage(dataDirectory);
         this.authService = new AuthenticationService(storage);
         this.budgetManager = new BudgetManager(storage);
-        this.expenseTracker = new ExpenseTracker(storage);
+        this.expenseTracker = new TransactionManager(storage);
         this.analyzer = new TransactionAnalyzer(new ArrayList<>());
         this.ui = new ConsoleUI(this);
     }
@@ -32,7 +32,7 @@ public class PennyWise {
         this.storage = storage;
         this.authService = new AuthenticationService(storage);
         this.budgetManager = budgetManager;
-        this.expenseTracker = new ExpenseTracker(storage);
+        this.expenseTracker = new TransactionManager(storage);
         this.analyzer = analyzer;
     }
 

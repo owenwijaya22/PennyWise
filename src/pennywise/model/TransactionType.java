@@ -1,4 +1,3 @@
-// TransactionType.java
 package pennywise.model;
 
 public enum TransactionType {
