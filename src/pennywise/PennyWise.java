@@ -15,7 +15,7 @@ public class PennyWise {
     private final IDataStorage storage;
     private final AuthenticationService authService;
     private final BudgetManager budgetManager;
-    private final TransactionManager expenseTracker;
+    private final TransactionManager TransactionManager;
     private TransactionAnalyzer analyzer;
     private ConsoleUI ui;
 
@@ -23,7 +23,7 @@ public class PennyWise {
         this.storage = new FileDataStorage(dataDirectory);
         this.authService = new AuthenticationService(storage);
         this.budgetManager = new BudgetManager(storage);
-        this.expenseTracker = new TransactionManager(storage);
+        this.TransactionManager = new TransactionManager(storage);
         this.analyzer = new TransactionAnalyzer(new ArrayList<>());
         this.ui = new ConsoleUI(this);
     }
@@ -32,7 +32,7 @@ public class PennyWise {
         this.storage = storage;
         this.authService = new AuthenticationService(storage);
         this.budgetManager = budgetManager;
-        this.expenseTracker = new TransactionManager(storage);
+        this.TransactionManager = new TransactionManager(storage);
         this.analyzer = analyzer;
     }
 
@@ -74,7 +74,7 @@ public class PennyWise {
                 }
             }
         }
-        return expenseTracker.addTransaction(currentUser.getUserId(), amount, category);
+        return TransactionManager.addTransaction(currentUser.getUserId(), amount, category);
     }
 
     public List<Transaction> getTransactions() {
@@ -82,7 +82,7 @@ public class PennyWise {
         if (currentUser == null) {
             return List.of();
         }
-        return expenseTracker.getTransactions(currentUser.getUserId());
+        return TransactionManager.getTransactions(currentUser.getUserId());
     }
 
     // Budget methods
@@ -118,7 +118,7 @@ public class PennyWise {
         if (currentUser == null) {
             return 0.0;
         }
-        return expenseTracker.getTransactions(currentUser.getUserId()).stream()
+        return TransactionManager.getTransactions(currentUser.getUserId()).stream()
                 .filter(t -> t.getType() == TransactionType.INCOME)
                 .mapToDouble(Transaction::getAmount)
                 .sum();
@@ -130,7 +130,7 @@ public class PennyWise {
             return 0.0;
         }
         YearMonth currentMonth = YearMonth.now();
-        return expenseTracker.getTransactions(currentUser.getUserId()).stream()
+        return TransactionManager.getTransactions(currentUser.getUserId()).stream()
             .filter(t -> t.getType() == TransactionType.EXPENSE)
             .filter(t -> {
                 YearMonth transactionMonth = YearMonth.from(t.getDate().toInstant()
@@ -147,7 +147,7 @@ public class PennyWise {
         if (currentUser == null) {
             return 0.0;
         }
-        return expenseTracker.getTransactions(currentUser.getUserId()).stream()
+        return TransactionManager.getTransactions(currentUser.getUserId()).stream()
                 .mapToDouble(Transaction::getAmount)
                 .sum();
     }
