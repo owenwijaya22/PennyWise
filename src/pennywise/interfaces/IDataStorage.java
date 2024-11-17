@@ -9,7 +9,6 @@ public interface IDataStorage {
     void saveData(List<User> users);
     List<User> loadData();
     
-    // methods buat nanti
     boolean saveUser(User user);
     User loadUser(String userID);
     boolean saveTransaction(String userID, Transaction transaction);

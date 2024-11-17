@@ -63,7 +63,8 @@ public class PennyWise {
         if (currentUser == null || amount <= 0) {
             return false;
         }
-
+        // OLD CODE, removed to implement strategy design pattern
+        // if (category.getTransactionType() == TransactionType.EXPENSE) {
         if (category.isExpenseCategory()) {
             double monthlyBudget = budgetManager.getCurrentMonthBudget(currentUser.getUserId());
             if (monthlyBudget > 0) {
@@ -130,7 +131,9 @@ public class PennyWise {
         }
         YearMonth currentMonth = YearMonth.now();
         return transactionManager.getTransactions(currentUser.getUserId()).stream()
-            .filter(t -> t.getAmount() < 0)
+//        		OLD CODE, removed to implement strategy design pattern
+//        		.filter(t -> t.getType() == TransactionType.EXPENSE)
+        		.filter(t -> t.getAmount() < 0)
             .filter(t -> {
                 YearMonth transactionMonth = YearMonth.from(t.getDate().toInstant()
                     .atZone(ZoneId.systemDefault())
