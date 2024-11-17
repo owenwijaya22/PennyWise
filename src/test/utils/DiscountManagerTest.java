@@ -3,7 +3,6 @@ package test.utils;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 import pennywise.model.Discount;
-import test.stubs.MockDiscountManager;
 import java.util.*;
 import java.lang.reflect.Field;
 import pennywise.utils.DiscountManager;
@@ -21,6 +20,7 @@ public class DiscountManagerTest {
 //     }
 
     @BeforeEach
+    @SuppressWarnings("unchecked")
     void setUp() throws Exception {
         // Reset the singleton instance before each test
         Field instance = DiscountManager.class.getDeclaredField("instance");
