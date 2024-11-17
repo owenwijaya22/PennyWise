@@ -37,6 +37,7 @@ public class FileDataStorage implements IDataStorage {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<User> loadData() {
         File file = new File(dataDirectory, USERS_FILE);
         if (!file.exists()) {
@@ -67,15 +68,17 @@ public class FileDataStorage implements IDataStorage {
         File file = new File(dataDirectory, USERS_FILE);
         File parent = file.getParentFile();
         if (!parent.exists()) {
-            parent.mkdirs();
+            boolean created = parent.mkdirs();
+            if (!created) {
+                throw new RuntimeException("Failed to create directory: " + parent.getPath());
+            }
         }
         
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(file))) {
             oos.writeObject(users);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to save data: " + e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save data: " + e.getMessage(), e);
         }
     }
 
@@ -93,12 +96,8 @@ public class FileDataStorage implements IDataStorage {
         List<User> users = loadData();
         users.removeIf(u -> u.getUserId().equals(user.getUserId()));
         users.add(user);
-        try {
-            saveData(users);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        saveData(users);
+        return true;
     }
 
     @Override
@@ -153,6 +152,7 @@ public class FileDataStorage implements IDataStorage {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Transaction> loadTransactions(String userId) {
         File file = new File(dataDirectory, userId + "_" + TRANSACTIONS_FILE);
         if (!file.exists()) {
@@ -194,6 +194,7 @@ public class FileDataStorage implements IDataStorage {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<Budget> loadBudgets(String userId) {
         File file = new File(dataDirectory, userId + "_" + BUDGETS_FILE);
         if (!file.exists()) {

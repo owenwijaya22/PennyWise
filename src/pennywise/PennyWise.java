@@ -17,7 +17,7 @@ public class PennyWise {
     private final BudgetManager budgetManager;
     private final TransactionManager transactionManager;
     private TransactionAnalyzer analyzer;
-    private ConsoleUI ui;
+    protected ConsoleUI ui;
 
     public PennyWise(String dataDirectory) {
         this.storage = new FileDataStorage(dataDirectory);
