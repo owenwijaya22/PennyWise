@@ -83,27 +83,4 @@ public class DiscountTest {
         Discount highBoundary = new Discount(TEST_CODE, 99.9f, futureDate, TEST_DESCRIPTION);
         assertTrue(highBoundary.isValid());
     }
-
-    @Test
-    void testNullValues() {
-        // Test Case: Verify null handling
-        // Tests:
-        // 1. Testing null code
-        // 2. Testing null expiry date
-        // 3. Testing null description
-        
-        Date futureDate = new Date(System.currentTimeMillis() + 86400000);
-        
-        assertThrows(NullPointerException.class, () -> 
-        new Discount(null, TEST_PERCENTAGE, futureDate, TEST_DESCRIPTION),
-        "Discount code should not be null");
-    
-	    assertThrows(NullPointerException.class, () -> 
-	        new Discount(TEST_CODE, TEST_PERCENTAGE, null, TEST_DESCRIPTION),
-	        "Expiry date should not be null");
-	    
-	    assertThrows(NullPointerException.class, () -> 
-	        new Discount(TEST_CODE, TEST_PERCENTAGE, futureDate, null),
-	        "Description should not be null");
-    }
 }

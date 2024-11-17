@@ -1,34 +1,44 @@
 package test.stubs;
 
-import pennywise.interfaces.*;
-import pennywise.model.*;
-import pennywise.service.*;
-import java.time.YearMonth;
+import pennywise.interfaces.IDataStorage;
+import pennywise.service.BudgetManager;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MockBudgetManager extends BudgetManager {
-    private double currentBudget = 0.0;
-    
-    public MockBudgetManager(IDataStorage storage) {
-        super(storage);
+    private final Map<String, Double> budgets = new HashMap<>();
+
+    public MockBudgetManager(IDataStorage dataStorage) {
+        super(dataStorage);
     }
 
+    @Override
     public boolean createBudget(String userId, double amount) {
-        if (amount < 0) return false;
-        currentBudget = amount;
+        if (userId == null || amount < 0) {
+            return false;
+        }
+        budgets.put(userId, amount);
         return true;
     }
 
-    public double getCurrentMonthBudget(String userId) {
-        return currentBudget;
-    }
-
-    public boolean isOverBudget(String userId, double currentExpenses, double proposedExpense) {
-        return currentBudget > 0 && (currentExpenses + proposedExpense) > currentBudget;
-    }
-
+    @Override
     public boolean updateBudget(String userId, double amount) {
-        if (amount < 0) return false;
-        currentBudget = amount;
+        if (userId == null || amount < 0) {
+            return false;
+        }
+        budgets.put(userId, amount);
         return true;
+    }
+
+    @Override
+    public double getCurrentMonthBudget(String userId) {
+        if (userId == null || !budgets.containsKey(userId)) {
+            return 0.0;
+        }
+        return budgets.get(userId);
+    }
+
+    public void clearAllData() {
+        budgets.clear();
     }
 }

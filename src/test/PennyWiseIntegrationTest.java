@@ -5,23 +5,40 @@ import org.junit.jupiter.api.*;
 import pennywise.model.*;
 import pennywise.service.*;
 import pennywise.interfaces.*;
-import test.stubs.*;
 import java.util.*;
 import pennywise.PennyWise;
+import java.io.File;
 
 public class PennyWiseIntegrationTest {
     private PennyWise pennywise;
-    private IDataStorage mockStorage;
-    private BudgetManager mockBudgetManager;
-    private TransactionAnalyzer mockAnalyzer;
+    private static final String TEST_DATA_DIR = "./test_integration_data";
     private static final String TEST_USER_ID = "testUser";
 
     @BeforeEach
     void setUp() {
-        mockStorage = new MockDataStorage();
-        mockBudgetManager = new MockBudgetManager(mockStorage);
-        mockAnalyzer = new TransactionAnalyzer(new ArrayList<>());
-        pennywise = new PennyWise(mockStorage, mockBudgetManager, mockAnalyzer);
+        // Clean test directory before creating PennyWise instance
+        File directory = new File(TEST_DATA_DIR);
+        if (directory.exists()) {
+            for (File file : directory.listFiles()) {
+                file.delete();
+            }
+            directory.delete();
+        }
+        
+        // Initialize PennyWise - FileDataStorage constructor will create directory
+        pennywise = new PennyWise(TEST_DATA_DIR);
+    }
+
+    @AfterEach
+    void tearDown() {
+        // Clean up test data after each test
+        File directory = new File(TEST_DATA_DIR);
+        if (directory.exists()) {
+            for (File file : directory.listFiles()) {
+                file.delete();
+            }
+            directory.delete();
+        }
     }
 
     @Test
@@ -91,5 +108,140 @@ public class PennyWiseIntegrationTest {
         Map<TransactionCategory, Double> expensesByCategory = analyzer.getExpensesByCategory();
         assertEquals(500.0, expensesByCategory.get(ExpenseCategory.FOOD)); // Now negative
         assertEquals(300.0, expensesByCategory.get(ExpenseCategory.TRANSPORTATION)); // Now negative
+    }
+
+    @Test
+    void testUserDataManagement() {
+        // Test user data clearing and application reset
+        assertTrue(pennywise.registerUser(TEST_USER_ID));
+        assertTrue(pennywise.login(TEST_USER_ID));
+        
+        // Add some data
+        pennywise.createBudget(1000.0);
+        pennywise.addTransaction(500.0, IncomeCategory.SALARY);
+        
+        // Test clearAllUserData
+        assertTrue(pennywise.clearAllUserData());
+        assertFalse(pennywise.isLoggedIn());
+        
+        // Try to login after clearing data
+        assertFalse(pennywise.login(TEST_USER_ID));
+        
+        // Test resetApplication
+        assertTrue(pennywise.registerUser("anotherUser"));
+        assertTrue(PennyWise.resetApplication(TEST_DATA_DIR));
+        assertFalse(pennywise.login("anotherUser"));
+    }
+
+    @Test
+    void testTransactionAnalysis() {
+        assertTrue(pennywise.registerUser(TEST_USER_ID));
+        assertTrue(pennywise.login(TEST_USER_ID));
+        
+        // Add mixed transactions
+        assertTrue(pennywise.addTransaction(1000.0, IncomeCategory.SALARY));
+        assertTrue(pennywise.addTransaction(200.0, ExpenseCategory.FOOD));
+        assertTrue(pennywise.addTransaction(500.0, IncomeCategory.INVESTMENT));
+        assertTrue(pennywise.addTransaction(300.0, ExpenseCategory.UTILITIES));
+        
+        // Test getTotalIncome
+        assertEquals(1500.0, pennywise.getTotalIncome());
+        
+        // Test getAnalyzer
+        TransactionAnalyzer analyzer = pennywise.getAnalyzer();
+        assertNotNull(analyzer);
+        assertEquals(1500.0, analyzer.getTotalIncome());
+        assertEquals(500.0, analyzer.getTotalExpenses());
+        
+        // Test when not logged in
+        pennywise.logout();
+        assertNull(pennywise.getAnalyzer());
+        assertEquals(0.0, pennywise.getTotalIncome());
+    }
+
+    @Test
+    void testBudgetManagement() {
+        assertTrue(pennywise.registerUser(TEST_USER_ID));
+        assertTrue(pennywise.login(TEST_USER_ID));
+        
+        // Test budget creation
+        assertTrue(pennywise.createBudget(1000.0));
+        assertEquals(1000.0, pennywise.getBudgetManager().getCurrentMonthBudget(TEST_USER_ID));
+        
+        // Test budget update
+        assertTrue(pennywise.updateBudget(1500.0));
+        assertEquals(1500.0, pennywise.getBudgetManager().getCurrentMonthBudget(TEST_USER_ID));
+        
+        // Test invalid budget amounts
+        assertFalse(pennywise.createBudget(-100.0));
+        assertFalse(pennywise.updateBudget(-50.0));
+    }
+
+    @Test
+    void testTransactionManagement() {
+        assertTrue(pennywise.registerUser(TEST_USER_ID));
+        assertTrue(pennywise.login(TEST_USER_ID));
+        
+        // Set up budget
+        assertTrue(pennywise.createBudget(1000.0));
+        
+        // Test valid transactions
+        assertTrue(pennywise.addTransaction(500.0, IncomeCategory.SALARY));
+        assertTrue(pennywise.addTransaction(300.0, ExpenseCategory.FOOD));
+        
+        // Test invalid transactions
+        assertFalse(pennywise.addTransaction(-100.0, ExpenseCategory.FOOD)); // Negative amount
+        assertFalse(pennywise.addTransaction(0.0, ExpenseCategory.FOOD)); // Zero amount
+        
+        // Test budget limit
+        assertFalse(pennywise.addTransaction(800.0, ExpenseCategory.ENTERTAINMENT)); // Would exceed budget
+        
+        // Verify transactions
+        List<Transaction> transactions = pennywise.getTransactions();
+        assertEquals(2, transactions.size());
+        
+        // Test when not logged in
+        pennywise.logout();
+        assertTrue(pennywise.getTransactions().isEmpty());
+        assertFalse(pennywise.addTransaction(100.0, ExpenseCategory.FOOD));
+    }
+
+    @Test
+    void testMainMethodInitialization() {
+        // Test Case: Verify main method initialization
+        // Tests:
+        // 1. PennyWise instance creation with default data directory
+        // 2. Data directory creation and management
+        
+        // Create a test directory path similar to main method
+        String testMainDir = "./pennywise_data_test_main";
+        
+        try {
+            // Create a new PennyWise instance similar to main method
+            PennyWise testPennyWise = new PennyWise(testMainDir);
+            
+            // Verify the instance is properly initialized
+            assertNotNull(testPennyWise);
+            
+            // Verify data directory is created
+            File dataDir = new File(testMainDir);
+            assertTrue(dataDir.exists());
+            assertTrue(dataDir.isDirectory());
+            
+            // Verify basic functionality works
+            assertTrue(testPennyWise.registerUser("testUser"));
+            assertTrue(testPennyWise.login("testUser"));
+            assertTrue(testPennyWise.isLoggedIn());
+            
+        } finally {
+            // Clean up test directory
+            File dataDir = new File(testMainDir);
+            if (dataDir.exists()) {
+                for (File file : dataDir.listFiles()) {
+                    file.delete();
+                }
+                dataDir.delete();
+            }
+        }
     }
 }
