@@ -9,11 +9,6 @@ public class Discount {
     private String description;
     
     public Discount(String code, float percentage, Date expiryDate, String description) {
-    	// NULL POINTER EXCEPTIONS TO VALIDATE NULL PARAMS
-    	if (code == null) throw new NullPointerException("Discount code cannot be null");
-        if (expiryDate == null) throw new NullPointerException("Expiry date cannot be null");
-        if (description == null) throw new NullPointerException("Description cannot be null");
-        
         this.code = code;
         this.percentage = percentage;
         this.expiryDate = expiryDate;
