@@ -11,7 +11,7 @@ public class BudgetManager {
     public BudgetManager(IDataStorage storage) {
         this.storage = storage;
     }
-
+    // refactored with extract method from User.java
     public boolean createBudget(String userId, double amount) {
         if (amount < 0) return false;
         Budget budget = new Budget(userId, amount);
