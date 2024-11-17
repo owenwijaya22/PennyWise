@@ -35,7 +35,7 @@ public final class UIConstants {
     public static final String NO_INCOMES_MESSAGE = "No incomes recorded yet.";
     public static final String NO_DISCOUNTS_MESSAGE = "\nNo discounts available currently.";
     public static final String BUDGET_UPDATE_FAILED_MESSAGE = "Failed to update budget. Please try again.";
-    public static final String BUDGET_UPDATE_SUCESS_MESSAGE = "Monthly budget updated successfully!";
+    public static final String BUDGET_UPDATE_SUCCESS_MESSAGE = "Monthly budget updated successfully!";
     public static final String BUDGET_SET_SUCCESS_MESSAGE = "Monthly budget set successfully!";
     public static final String BUDGET_SET_FAILED_MESSAGE = "Failed to set budget. Please try again.";
     public static final String INCOME_SUCCESS_MESSAGE = "Income added successfully!";

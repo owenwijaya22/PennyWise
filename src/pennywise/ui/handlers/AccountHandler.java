@@ -17,7 +17,7 @@ public class AccountHandler {
         this.menuHandler = menuHandler;
     }
 
-    void handleLogin() {
+    public void handleLogin() {
         System.out.print(UIConstants.ENTER_USER_ID_PROMPT);
         String userId = inputHandler.readLine();
         
@@ -28,7 +28,7 @@ public class AccountHandler {
         }
     }
 
-    void handleRegistration() {
+    public void handleRegistration() {
         System.out.print(UIConstants.ENTER_NEW_USER_ID_PROMPT);
         String userId = inputHandler.readLine();
         
@@ -39,7 +39,7 @@ public class AccountHandler {
         }
     }
 
-    void handleAccountManagement() {
+    public void handleAccountManagement() {
         System.out.println(UIConstants.ACCOUNT_MANAGEMENT_TITLE);
         for (String option : UIConstants.ACCOUNT_MENU_OPTIONS) {
             System.out.println(option);
