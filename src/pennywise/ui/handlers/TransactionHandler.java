@@ -47,7 +47,7 @@ public class TransactionHandler {
         }
     }
 
-    void handleAddExpense() {
+    public void handleAddExpense() {
         System.out.print(UIConstants.ENTER_AMOUNT_PROMPT);
         double amount = inputHandler.readDouble();
         if (amount < 0) {
@@ -75,7 +75,7 @@ public class TransactionHandler {
         handleTransaction(amount, category, true);
     }
 
-    void handleAddIncome() {
+    public void handleAddIncome() {
         System.out.print(UIConstants.ENTER_AMOUNT_PROMPT);
         double amount = inputHandler.readDouble();
         if (amount < 0) {
@@ -87,7 +87,7 @@ public class TransactionHandler {
         handleTransaction(amount, category, false);
     }
 
-    void handleViewTransactions() {
+    public void handleViewTransactions() {
         List<Transaction> transactions = pennywise.getTransactions();
         if (transactions.isEmpty()) {
             System.out.println(UIConstants.NO_TRANSACTIONS_MESSAGE);
@@ -103,7 +103,7 @@ public class TransactionHandler {
         }
     }
 
-    void handleViewMonthlyExpenses() {
+    public void handleViewMonthlyExpenses() {
         TransactionAnalyzer analyzer = pennywise.getAnalyzer();
         if (analyzer == null) {
             System.out.println(UIConstants.LOGIN_PROMPT_MONTHLY_EXPENSES);
@@ -120,7 +120,7 @@ public class TransactionHandler {
         }
     }
 
-    void handleViewMonthlyIncomes() {
+    public void handleViewMonthlyIncomes() {
         TransactionAnalyzer analyzer = pennywise.getAnalyzer();
         if (analyzer == null) {
             System.out.println(UIConstants.LOGIN_PROMPT_MONTHLY_EXPENSES);
@@ -137,7 +137,7 @@ public class TransactionHandler {
         }
     }
 
-    void handleViewExpensesByCategory() {
+    public void handleViewExpensesByCategory() {
         TransactionAnalyzer analyzer = pennywise.getAnalyzer();
         if (analyzer == null) {
             System.out.println(UIConstants.LOGIN_PROMPT_EXPENSES_CATEGORY);
@@ -154,7 +154,7 @@ public class TransactionHandler {
         }
     }
 
-    void handleViewIncomesByCategory() {
+    public void handleViewIncomesByCategory() {
         TransactionAnalyzer analyzer = pennywise.getAnalyzer();
         if (analyzer == null) {
             System.out.println(UIConstants.LOGIN_PROMPT_INCOMES_CATEGORY);
@@ -171,7 +171,7 @@ public class TransactionHandler {
         }
     }
 
-    void handleViewBalance() {
+    public void handleViewBalance() {
         System.out.println(UIConstants.FINANCIAL_SUMMARY_TITLE);
         System.out.printf(UIConstants.TOTAL_INCOME_FORMAT, pennywise.getTotalIncome());
         System.out.printf(UIConstants.TOTAL_EXPENSES_FORMAT, pennywise.getTotalExpenses());

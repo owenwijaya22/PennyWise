@@ -12,7 +12,12 @@ public class BudgetHandler {
         this.inputHandler = inputHandler;
     }
 
-    void handleCreateBudget() {
+    public void handleCreateBudget() {
+        if (!pennywise.isLoggedIn() || pennywise.getCurrentUser() == null) {
+            System.out.println(UIConstants.LOGIN_PROMPT);
+            return;
+        }
+        
         System.out.println(UIConstants.SET_MONTHLY_BUDGET_TITLE);
         System.out.print(UIConstants.ENTER_BUDGET_PROMPT);        
         double amount = inputHandler.readDouble();
@@ -29,7 +34,12 @@ public class BudgetHandler {
         }
     }
 
-    void handleEditBudget() {
+    public void handleEditBudget() {
+        if (pennywise.getCurrentUser() == null) {
+            System.out.println(UIConstants.LOGIN_PROMPT);
+            return;
+        }
+
         double currentBudget = pennywise.getBudgetManager().getCurrentMonthBudget(pennywise.getCurrentUser().getUserId());
         System.out.println(UIConstants.EDIT_MONTHLY_BUDGET_TITLE);
         System.out.printf(UIConstants.CURRENT_BUDGET_FORMAT, currentBudget);
@@ -41,7 +51,7 @@ public class BudgetHandler {
         }
 
         if (pennywise.updateBudget(newAmount)) {
-            System.out.println(UIConstants.BUDGET_UPDATE_SUCESS_MESSAGE);
+            System.out.println(UIConstants.BUDGET_UPDATE_SUCCESS_MESSAGE);
             System.out.printf(UIConstants.NEW_BUDGET_FORMAT, newAmount);
             
             // Show updated budget status
@@ -62,15 +72,15 @@ public class BudgetHandler {
         }
     }
 
-    void handleViewBudgets() {
-        if (pennywise.getCurrentUser() == null) {
+    public void handleViewBudgets() {
+        if (!pennywise.isLoggedIn()) {
             System.out.println(UIConstants.LOGIN_PROMPT);
             return;
         }
 
         double monthlyBudget = pennywise.getBudgetManager().getCurrentMonthBudget(pennywise.getCurrentUser().getUserId());
         if (monthlyBudget <= 0) {
-        	if (inputHandler.askYesNo(UIConstants.ENTER_NO_SET_BUDGET_PROMPT)) {
+            if (inputHandler.askYesNo(UIConstants.ENTER_NO_SET_BUDGET_PROMPT)) {
                 handleCreateBudget();
             }
             return;

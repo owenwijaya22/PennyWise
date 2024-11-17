@@ -14,7 +14,7 @@ public class DiscountHandler {
         this.inputHandler = inputHandler;
     }
 
-    void handleDiscountVisualization() {
+    public void handleDiscountVisualization() {
         DiscountManager discountManager = DiscountManager.getInstance();
         
         while (true) {
@@ -44,7 +44,7 @@ public class DiscountHandler {
         }
     }
 
-    void handleDiscountCode(double amount) {
+    public void handleDiscountCode(double amount) {
         System.out.print(UIConstants.ENTER_DISCOUNT_CODE_PROMPT);
         String discountCode = inputHandler.readLine().trim().toUpperCase();
         
@@ -59,7 +59,7 @@ public class DiscountHandler {
         }
     }
 
-    void addCustomDiscount(DiscountManager discountManager) {
+    public void addCustomDiscount(DiscountManager discountManager) {
         System.out.println(UIConstants.CUSTOM_DISCOUNT_TITLE);
         Discount newDiscount;
         while(true) {
