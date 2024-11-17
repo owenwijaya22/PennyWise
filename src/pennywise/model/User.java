@@ -1,29 +1,31 @@
 package pennywise.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class User implements Serializable {
+	// Ensure that a loaded class corresponds exactly to a serialized object
+	private static final long serialVersionUID = 1L;
     private final String userId;
-    private final List<Budget> budgets;
+//OLD CODE, extracted to BudgetManager.java
+//    private final List<Budget> budgets;
 
     public User(String userId) {
         this.userId = userId;
-        this.budgets = new ArrayList<>();
+//OLD CODE, extracted to BudgetManager.java
+//        this.budgets = new ArrayList<>();
     }
 
     public String getUserId() {
         return userId;
     }
-
-    public List<Budget> getBudgets() {
-        return new ArrayList<>(budgets);
-    }
-
-    public void addBudget(Budget budget) {
-        if (budget != null) {
-            budgets.add(budget);
-        }
-    }
+//OLD CODE, extracted to BudgetManager.java
+//    public List<Budget> getBudgets() {
+//        return new ArrayList<>(budgets);
+//    }
+//
+//    public void addBudget(Budget budget) {
+//        if (budget != null) {
+//            budgets.add(budget);
+//        }
+//    }
 }

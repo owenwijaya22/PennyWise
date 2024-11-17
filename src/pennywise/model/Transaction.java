@@ -6,6 +6,8 @@ import java.util.Date;
 import pennywise.interfaces.TransactionCategory;
 
 public class Transaction implements Serializable {
+	// Ensure that a loaded class corresponds exactly to a serialized object
+	private static final long serialVersionUID = 1L;
     private final String userId;
     private final double amount;
     private final Date date;
