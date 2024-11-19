@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package pennywise;
 
 import pennywise.interfaces.IDataStorage;
@@ -11,14 +14,35 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * The Class PennyWise.
+ */
 public class PennyWise {
+    
+    /** The storage. */
     private final IDataStorage storage;
+    
+    /** The auth service. */
     private final AuthenticationService authService;
+    
+    /** The budget manager. */
     private final BudgetManager budgetManager;
+    
+    /** The transaction manager. */
     private final TransactionManager transactionManager;
+    
+    /** The analyzer. */
     private TransactionAnalyzer analyzer;
+    
+    /** The ui. */
     protected ConsoleUI ui;
 
+    /**
+     * Instantiates a new penny wise.
+     *
+     * @param dataDirectory the data directory
+     */
     public PennyWise(String dataDirectory) {
         this.storage = new FileDataStorage(dataDirectory);
         this.authService = new AuthenticationService(storage);
@@ -28,6 +52,13 @@ public class PennyWise {
         this.ui = new ConsoleUI(this);
     }
 
+    /**
+     * Instantiates a new penny wise.
+     *
+     * @param storage the storage
+     * @param budgetManager the budget manager
+     * @param analyzer the analyzer
+     */
     public PennyWise(IDataStorage storage, BudgetManager budgetManager, TransactionAnalyzer analyzer) {
         this.storage = storage;
         this.authService = new AuthenticationService(storage);
@@ -36,28 +67,60 @@ public class PennyWise {
         this.analyzer = analyzer;
     }
 
+    /**
+     * The main method.
+     *
+     * @param args the arguments
+     */
     public static void main(String[] args) {
         PennyWise pennywise = new PennyWise("./pennywise_data");
         pennywise.ui.start();
     }
 
+    /**
+     * Login.
+     *
+     * @param userId the user id
+     * @return true, if successful
+     */
     // Authentication methods remain unchanged
     public boolean login(String userId) {
         return authService.login(userId);
     }
 
+    /**
+     * Register user.
+     *
+     * @param userId the user id
+     * @return true, if successful
+     */
     public boolean registerUser(String userId) {
         return authService.register(userId);
     }
 
+    /**
+     * Logout.
+     */
     public void logout() {
         authService.logout();
     }
 
+    /**
+     * Checks if is logged in.
+     *
+     * @return true, if is logged in
+     */
     public boolean isLoggedIn() {
         return authService.getCurrentUser() != null;
     }
 
+    /**
+     * Adds the transaction.
+     *
+     * @param amount the amount
+     * @param category the category
+     * @return true, if successful
+     */
     public  boolean addTransaction(double amount, TransactionCategory category) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null || amount <= 0) {
@@ -78,6 +141,11 @@ public class PennyWise {
         return transactionManager.addTransaction(currentUser.getUserId(), amount, category);
     }
 
+    /**
+     * Gets the transactions.
+     *
+     * @return the transactions
+     */
     public List<Transaction> getTransactions() {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null) {
@@ -86,6 +154,12 @@ public class PennyWise {
         return transactionManager.getTransactions(currentUser.getUserId());
     }
 
+    /**
+     * Creates the budget.
+     *
+     * @param amount the amount
+     * @return true, if successful
+     */
     public boolean createBudget(double amount) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null || amount < 0) {
@@ -94,6 +168,12 @@ public class PennyWise {
         return budgetManager.createBudget(currentUser.getUserId(), amount);
     }
     
+    /**
+     * Update budget.
+     *
+     * @param amount the amount
+     * @return true, if successful
+     */
     public boolean updateBudget(double amount) {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null || amount < 0) {
@@ -102,6 +182,11 @@ public class PennyWise {
         return budgetManager.updateBudget(currentUser.getUserId(), amount);
     }
 
+    /**
+     * Gets the analyzer.
+     *
+     * @return the analyzer
+     */
     // Modified Analysis methods
     public TransactionAnalyzer getAnalyzer() {
         User currentUser = authService.getCurrentUser();
@@ -113,6 +198,11 @@ public class PennyWise {
         return analyzer;
     }
 
+    /**
+     * Gets the total income.
+     *
+     * @return the total income
+     */
     public double getTotalIncome() {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null) {
@@ -124,6 +214,11 @@ public class PennyWise {
                 .sum();
     }
 
+    /**
+     * Gets the total expenses.
+     *
+     * @return the total expenses
+     */
     public double getTotalExpenses() {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null) {
@@ -144,6 +239,11 @@ public class PennyWise {
             .sum();
     }
 
+    /**
+     * Gets the current balance.
+     *
+     * @return the current balance
+     */
     public double getCurrentBalance() {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null) {
@@ -154,6 +254,11 @@ public class PennyWise {
                 .sum();
     }
 
+    /**
+     * Delete account.
+     *
+     * @return true, if successful
+     */
     // Account management methods remain unchanged
     public boolean deleteAccount() {
         User currentUser = authService.getCurrentUser();
@@ -167,6 +272,11 @@ public class PennyWise {
         return deleted;
     }
 
+    /**
+     * Clear all user data.
+     *
+     * @return true, if successful
+     */
     public boolean clearAllUserData() {
         User currentUser = authService.getCurrentUser();
         if (currentUser == null) {
@@ -177,16 +287,32 @@ public class PennyWise {
         return storage.deleteUser(userId);
     }
 
+    /**
+     * Reset application.
+     *
+     * @param dataDirectory the data directory
+     * @return true, if successful
+     */
     public static boolean resetApplication(String dataDirectory) {
         IDataStorage storage = new FileDataStorage(dataDirectory);
         return storage.clearAllData();
     }
 
+    /**
+     * Gets the current user.
+     *
+     * @return the current user
+     */
     // Getter methods for testing
     public User getCurrentUser() {
         return authService.getCurrentUser();
     }
 
+    /**
+     * Gets the budget manager.
+     *
+     * @return the budget manager
+     */
     public BudgetManager getBudgetManager() {
         return budgetManager;
     }

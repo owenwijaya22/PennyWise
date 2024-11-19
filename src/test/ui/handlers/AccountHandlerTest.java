@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.ui.handlers;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,14 +12,33 @@ import test.stubs.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+
+/**
+ * The Class AccountHandlerTest.
+ */
 public class AccountHandlerTest {
+    
+    /** The account handler. */
     private AccountHandler accountHandler;
+    
+    /** The mock pennywise. */
     private MockPennyWise mockPennywise;
+    
+    /** The mock input handler. */
     private MockInputHandler mockInputHandler;
+    
+    /** The mock menu handler. */
     private MockMenuHandler mockMenuHandler;
+    
+    /** The output stream. */
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    
+    /** The original out. */
     private final PrintStream originalOut = System.out;
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         mockPennywise = new MockPennyWise();
@@ -27,11 +49,17 @@ public class AccountHandlerTest {
         System.setOut(new PrintStream(outputStream));
     }
 
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown() {
         System.setOut(originalOut);
     }
 
+    /**
+     * Test login success.
+     */
     @Test
     void testLoginSuccess() {
         // Test Case: Verify successful login
@@ -48,6 +76,9 @@ public class AccountHandlerTest {
         assertEquals("validUser", mockPennywise.getCurrentUser().getUserId());
     }
 
+    /**
+     * Test login failure.
+     */
     @Test
     void testLoginFailure() {
         // Test Case: Verify failed login
@@ -63,6 +94,9 @@ public class AccountHandlerTest {
         assertFalse(mockPennywise.isLoggedIn());
     }
 
+    /**
+     * Test registration success.
+     */
     @Test
     void testRegistrationSuccess() {
         // Test Case: Verify successful registration
@@ -77,6 +111,9 @@ public class AccountHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.REGISTRATION_SUCCESS_MESSAGE));
     }
 
+    /**
+     * Test registration failure.
+     */
     @Test
     void testRegistrationFailure() {
         // Test Case: Verify failed registration
@@ -92,6 +129,9 @@ public class AccountHandlerTest {
         assertFalse(mockPennywise.isRegistered());
     }
 
+    /**
+     * Test account management clear data cancel.
+     */
     @Test
     void testAccountManagementClearDataCancel() {
         // Test Case: Verify cancelled data clearing
@@ -111,6 +151,9 @@ public class AccountHandlerTest {
         assertFalse(mockMenuHandler.wasLoginMenuCalled());
     }
 
+    /**
+     * Test account management clear data success.
+     */
     @Test
     void testAccountManagementClearDataSuccess() {
         // Test Case: Verify successful data clearing
@@ -132,6 +175,9 @@ public class AccountHandlerTest {
         assertTrue(mockMenuHandler.wasLoginMenuCalled());
     }
 
+    /**
+     * Test account management clear data failure.
+     */
     @Test
     void testAccountManagementClearDataFailure() {
         // Test Case: Verify failed data clearing
@@ -152,6 +198,9 @@ public class AccountHandlerTest {
         assertFalse(mockMenuHandler.wasLoginMenuCalled());
     }
 
+    /**
+     * Test account management delete account success.
+     */
     @Test
     void testAccountManagementDeleteAccountSuccess() {
         // Test Case: Verify successful account deletion
@@ -173,6 +222,9 @@ public class AccountHandlerTest {
         assertTrue(mockMenuHandler.wasLoginMenuCalled());
     }
 
+    /**
+     * Test account management delete account failure.
+     */
     @Test
     void testAccountManagementDeleteAccountFailure() {
         // Test Case: Verify failed account deletion
@@ -193,6 +245,9 @@ public class AccountHandlerTest {
         assertFalse(mockMenuHandler.wasLoginMenuCalled());
     }
 
+    /**
+     * Test account management return option.
+     */
     @Test
     void testAccountManagementReturnOption() {
         // Test Case: Verify return option
@@ -211,6 +266,9 @@ public class AccountHandlerTest {
         assertTrue(mockPennywise.isLoggedIn());
     }
 
+    /**
+     * Test account management view user id success.
+     */
     @Test
     void testAccountManagementViewUserIdSuccess() {
         // Test Case: Verify viewing user ID
@@ -230,6 +288,9 @@ public class AccountHandlerTest {
         assertEquals(testUserId, mockPennywise.getCurrentUser().getUserId());
     }
 
+    /**
+     * Test account management invalid option.
+     */
     @Test
     void testAccountManagementInvalidOption() {
         // Test Case: Verify invalid option handling
@@ -246,6 +307,9 @@ public class AccountHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.INVALID_OPTION_MESSAGE));
     }
 
+    /**
+     * Test account management negative option.
+     */
     @Test
     void testAccountManagementNegativeOption() {
         // Test Case: Verify negative option handling

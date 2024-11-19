@@ -1,14 +1,32 @@
+/*
+ * 
+ */
 package pennywise.ui;
 
 import pennywise.PennyWise;
 import pennywise.ui.handlers.*;
 import pennywise.utils.DiscountManager;
 
+
+/**
+ * The Class ConsoleUI.
+ */
 public class ConsoleUI {
+    
+    /** The pennywise. */
     private final PennyWise pennywise;
+    
+    /** The input handler. */
     private final InputHandler inputHandler;
+    
+    /** The menu handler. */
     private final MenuHandler menuHandler;
 
+    /**
+     * Instantiates a new console UI.
+     *
+     * @param pennywise the pennywise
+     */
     public ConsoleUI(PennyWise pennywise) {
         this.pennywise = pennywise;
         this.inputHandler = new InputHandler();
@@ -23,6 +41,9 @@ public class ConsoleUI {
         accountHandler.setMenuHandler(menuHandler);
     }
 
+    /**
+     * Start.
+     */
     public void start() {
         while (true) {
             if (!pennywise.isLoggedIn()) {

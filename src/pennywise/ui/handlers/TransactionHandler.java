@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package pennywise.ui.handlers;
 
 import pennywise.PennyWise;
@@ -9,15 +12,36 @@ import pennywise.interfaces.TransactionCategory;
 
 import java.util.*;
 
+
+/**
+ * The Class TransactionHandler.
+ */
 public class TransactionHandler {
+    
+    /** The pennywise. */
     private final PennyWise pennywise;
+    
+    /** The input handler. */
     private final InputHandler inputHandler;
 
+    /**
+     * Instantiates a new transaction handler.
+     *
+     * @param pennywise the pennywise
+     * @param inputHandler the input handler
+     */
     public TransactionHandler(PennyWise pennywise, InputHandler inputHandler) {
         this.pennywise = pennywise;
         this.inputHandler = inputHandler;
     }
 
+    /**
+     * Handle category selection.
+     *
+     * @param <T> the generic type
+     * @param categoryClass the category class
+     * @return the t
+     */
     private <T extends Enum<T> & TransactionCategory> T handleCategorySelection(Class<T> categoryClass) {
         System.out.println(UIConstants.SELECT_CATEGORY_PROMPT);
         T[] categories = categoryClass.getEnumConstants();
@@ -32,6 +56,14 @@ public class TransactionHandler {
         return null;
     }
 
+    /**
+     * Handle transaction.
+     *
+     * @param amount the amount
+     * @param category the category
+     * @param isExpense the is expense
+     * @return true, if successful
+     */
     private boolean handleTransaction(double amount, TransactionCategory category, boolean isExpense) {
         if (category == null) {
             System.out.println(UIConstants.INVALID_CATEGORY_MESSAGE);
@@ -47,6 +79,9 @@ public class TransactionHandler {
         }
     }
 
+    /**
+     * Handle add expense.
+     */
     public void handleAddExpense() {
         System.out.print(UIConstants.ENTER_AMOUNT_PROMPT);
         double amount = inputHandler.readDouble();
@@ -75,6 +110,9 @@ public class TransactionHandler {
         handleTransaction(amount, category, true);
     }
 
+    /**
+     * Handle add income.
+     */
     public void handleAddIncome() {
         System.out.print(UIConstants.ENTER_AMOUNT_PROMPT);
         double amount = inputHandler.readDouble();
@@ -87,6 +125,9 @@ public class TransactionHandler {
         handleTransaction(amount, category, false);
     }
 
+    /**
+     * Handle view transactions.
+     */
     public void handleViewTransactions() {
         List<Transaction> transactions = pennywise.getTransactions();
         if (transactions.isEmpty()) {
@@ -103,6 +144,9 @@ public class TransactionHandler {
         }
     }
 
+    /**
+     * Handle view monthly expenses.
+     */
     public void handleViewMonthlyExpenses() {
         TransactionAnalyzer analyzer = pennywise.getAnalyzer();
         if (analyzer == null) {
@@ -120,6 +164,9 @@ public class TransactionHandler {
         }
     }
 
+    /**
+     * Handle view monthly incomes.
+     */
     public void handleViewMonthlyIncomes() {
         TransactionAnalyzer analyzer = pennywise.getAnalyzer();
         if (analyzer == null) {
@@ -137,6 +184,9 @@ public class TransactionHandler {
         }
     }
 
+    /**
+     * Handle view expenses by category.
+     */
     public void handleViewExpensesByCategory() {
         TransactionAnalyzer analyzer = pennywise.getAnalyzer();
         if (analyzer == null) {
@@ -154,6 +204,9 @@ public class TransactionHandler {
         }
     }
 
+    /**
+     * Handle view incomes by category.
+     */
     public void handleViewIncomesByCategory() {
         TransactionAnalyzer analyzer = pennywise.getAnalyzer();
         if (analyzer == null) {
@@ -171,6 +224,9 @@ public class TransactionHandler {
         }
     }
 
+    /**
+     * Handle view balance.
+     */
     public void handleViewBalance() {
         System.out.println(UIConstants.FINANCIAL_SUMMARY_TITLE);
         System.out.printf(UIConstants.TOTAL_INCOME_FORMAT, pennywise.getTotalIncome());

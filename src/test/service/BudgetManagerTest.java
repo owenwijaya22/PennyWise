@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.service;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,11 +15,24 @@ import pennywise.interfaces.IDataStorage;
 import pennywise.storage.FileDataStorage;
 import pennywise.service.BudgetManager;
 
+
+/**
+ * The Class BudgetManagerTest.
+ */
 public class BudgetManagerTest {
+    
+    /** The budget manager. */
     private BudgetManager budgetManager;
+    
+    /** The Constant TEST_DATA_DIR. */
     private static final String TEST_DATA_DIR = "./test_data";
+    
+    /** The Constant TEST_USER_ID. */
     private static final String TEST_USER_ID = "testUser";
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         File directory = new File(TEST_DATA_DIR);
@@ -26,6 +42,9 @@ public class BudgetManagerTest {
         budgetManager = new BudgetManager(storage);
     }
     
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown() {
         File directory = new File(TEST_DATA_DIR);
@@ -40,6 +59,9 @@ public class BudgetManagerTest {
         }
     }
 
+    /**
+     * Test create budget.
+     */
     @Test
     void testCreateBudget() {
         // Test Case: Verify budget creation functionality
@@ -51,6 +73,9 @@ public class BudgetManagerTest {
         assertEquals(1000.0, budgetManager.getCurrentMonthBudget(TEST_USER_ID));
     }
 
+    /**
+     * Test invalid budget.
+     */
     @Test
     void testInvalidBudget() {
         // Test Case: Verify handling of invalid budget amounts
@@ -62,6 +87,9 @@ public class BudgetManagerTest {
         assertEquals(0.0, budgetManager.getCurrentMonthBudget(TEST_USER_ID));
     }
 
+    /**
+     * Test update budget.
+     */
     @Test
     void testUpdateBudget() {
         // Test Case: Verify budget update functionality
@@ -75,6 +103,9 @@ public class BudgetManagerTest {
         assertEquals(1500.0, budgetManager.getCurrentMonthBudget(TEST_USER_ID));
     }
 
+    /**
+     * Test is over budget.
+     */
     @Test
     void testIsOverBudget() {
         // Test Case: Verify budget limit checking functionality
@@ -88,6 +119,9 @@ public class BudgetManagerTest {
         assertTrue(budgetManager.isOverBudget(TEST_USER_ID, 800.0, 300.0));
     }
 
+    /**
+     * Test decimal budget.
+     */
     @Test
     void testDecimalBudget() {
         // Test Case: Handling of decimal budget amounts
@@ -100,6 +134,9 @@ public class BudgetManagerTest {
         assertEquals(decimalAmount, budgetManager.getCurrentMonthBudget(TEST_USER_ID));
     }
 
+    /**
+     * Test multiple budget updates.
+     */
     @Test
     void testMultipleBudgetUpdates() {
         // Test Case: Multiple budget updates in same month
@@ -114,6 +151,9 @@ public class BudgetManagerTest {
         assertEquals(2000.0, budgetManager.getCurrentMonthBudget(TEST_USER_ID));
     }
 
+    /**
+     * Test large budget amount.
+     */
     @Test
     void testLargeBudgetAmount() {
         // Test Case: Handling of large budget amounts
@@ -126,6 +166,9 @@ public class BudgetManagerTest {
         assertEquals(largeAmount, budgetManager.getCurrentMonthBudget(TEST_USER_ID));
     }
 
+    /**
+     * Test budget overflow scenarios.
+     */
     @Test
     void testBudgetOverflowScenarios() {
         // Test Case: Handling complex over-budget scenarios
@@ -142,6 +185,9 @@ public class BudgetManagerTest {
         assertFalse(budgetManager.isOverBudget(TEST_USER_ID, 900.0, 99.9));   // slightly under budget
     }
     
+    /**
+     * Test update without initial budget.
+     */
     @Test
     void testUpdateWithoutInitialBudget() {
         // Test Case: Updating budget without creating one first
@@ -149,6 +195,9 @@ public class BudgetManagerTest {
         assertEquals(1500.0, budgetManager.getCurrentMonthBudget(TEST_USER_ID));
     }
     
+    /**
+     * Test double precision edge cases.
+     */
     @Test
     void testDoublePrecisionEdgeCases() {
     	// Test Case: Handling edge cases for double precision
@@ -170,6 +219,9 @@ public class BudgetManagerTest {
         assertEquals(maxPrecision, budgetManager.getCurrentMonthBudget(TEST_USER_ID));
     }
 
+    /**
+     * Test update budget with negative amount.
+     */
     @Test
     void testUpdateBudgetWithNegativeAmount() {
         // Test Case: Verify update budget with negative amount
@@ -183,6 +235,9 @@ public class BudgetManagerTest {
         assertEquals(1000.0, budgetManager.getCurrentMonthBudget(TEST_USER_ID));
     }
 
+    /**
+     * Test is over budget with zero budget.
+     */
     @Test
     void testIsOverBudgetWithZeroBudget() {
         // Test Case: Verify over-budget behavior with zero budget
@@ -196,6 +251,9 @@ public class BudgetManagerTest {
         assertTrue(budgetManager.isOverBudget(TEST_USER_ID, 0.0, 0.0));
     }
 
+    /**
+     * Test set up with existing empty directory.
+     */
     @Test
     void testSetUpWithExistingEmptyDirectory() {
         // Test Case: Setup with an existing but empty directory
@@ -209,6 +267,9 @@ public class BudgetManagerTest {
         assertTrue(testManager.createBudget(TEST_USER_ID, 100.0));
     }
 
+    /**
+     * Test tear down with missing files.
+     */
     @Test
     void testTearDownWithMissingFiles() {
         // Test Case: TearDown with missing files
@@ -221,6 +282,11 @@ public class BudgetManagerTest {
         
     }
 
+    /**
+     * Test corrupted budget file.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     void testCorruptedBudgetFile() throws IOException {
         // Test Case: Corrupted budget file

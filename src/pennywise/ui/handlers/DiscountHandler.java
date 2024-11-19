@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package pennywise.ui.handlers;
 
 import pennywise.model.Discount;
@@ -5,15 +8,32 @@ import pennywise.ui.UIConstants;
 import pennywise.utils.DiscountManager;
 import java.util.*;
 
+
+/**
+ * The Class DiscountHandler.
+ */
 public class DiscountHandler {
+    
+    /** The discount manager. */
     private final DiscountManager discountManager;
+    
+    /** The input handler. */
     private final InputHandler inputHandler;
 
+    /**
+     * Instantiates a new discount handler.
+     *
+     * @param discountManager the discount manager
+     * @param inputHandler the input handler
+     */
     public DiscountHandler(DiscountManager discountManager, InputHandler inputHandler) {
         this.discountManager = discountManager;
         this.inputHandler = inputHandler;
     }
 
+    /**
+     * Handle discount visualization.
+     */
     public void handleDiscountVisualization() {
         DiscountManager discountManager = DiscountManager.getInstance();
         
@@ -44,6 +64,11 @@ public class DiscountHandler {
         }
     }
 
+    /**
+     * Handle discount code.
+     *
+     * @param amount the amount
+     */
     public void handleDiscountCode(double amount) {
         System.out.print(UIConstants.ENTER_DISCOUNT_CODE_PROMPT);
         String discountCode = inputHandler.readLine().trim().toUpperCase();
@@ -59,6 +84,11 @@ public class DiscountHandler {
         }
     }
 
+    /**
+     * Adds the custom discount.
+     *
+     * @param discountManager the discount manager
+     */
     public void addCustomDiscount(DiscountManager discountManager) {
         System.out.println(UIConstants.CUSTOM_DISCOUNT_TITLE);
         Discount newDiscount;
@@ -88,6 +118,11 @@ public class DiscountHandler {
         
     }
 
+    /**
+     * Adds the predetermined discount.
+     *
+     * @param discountManager the discount manager
+     */
     private void addPredeterminedDiscount(DiscountManager discountManager) {
         System.out.println(UIConstants.PREDETERMINED_DISCOUNT_TITLE);
         for (String option : UIConstants.DISCOUNT_OPTIONS) {
@@ -162,6 +197,11 @@ public class DiscountHandler {
         }
     }
 
+    /**
+     * Display discounts.
+     *
+     * @param discounts the discounts
+     */
     private void displayDiscounts(List<Discount> discounts) {
         if (discounts.isEmpty()) {
             System.out.println(UIConstants.NO_DISCOUNTS_MESSAGE);

@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package pennywise.storage;
 
 import pennywise.interfaces.IDataStorage;
@@ -6,12 +9,29 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * The Class FileDataStorage.
+ */
 public class FileDataStorage implements IDataStorage {
+    
+    /** The data directory. */
     private final String dataDirectory;
+    
+    /** The Constant USERS_FILE. */
     private static final String USERS_FILE = "users.dat";
+    
+    /** The Constant TRANSACTIONS_FILE. */
     private static final String TRANSACTIONS_FILE = "transactions.dat";
+    
+    /** The Constant BUDGETS_FILE. */
     private static final String BUDGETS_FILE = "budgets.dat";
 
+    /**
+     * Instantiates a new file data storage.
+     *
+     * @param dataDirectory the data directory
+     */
     public FileDataStorage(String dataDirectory) {
         this.dataDirectory = dataDirectory;
         initializeDirectory();
@@ -25,6 +45,9 @@ public class FileDataStorage implements IDataStorage {
 //        }
 //    }
     
+    /**
+     * Initialize directory.
+     */
     // NEW CODE
     private void initializeDirectory() {
         File directory = new File(dataDirectory);
@@ -36,6 +59,11 @@ public class FileDataStorage implements IDataStorage {
         }
     }
 
+    /**
+     * Load data.
+     *
+     * @return the list
+     */
     @Override
     @SuppressWarnings("unchecked")
     public List<User> loadData() {
@@ -62,6 +90,11 @@ public class FileDataStorage implements IDataStorage {
 //        }
 //    }
     
+    /**
+     * Save data.
+     *
+     * @param users the users
+     */
     // NEW CODE
     @Override
     public void saveData(List<User> users) {
@@ -82,6 +115,12 @@ public class FileDataStorage implements IDataStorage {
         }
     }
 
+    /**
+     * Load user.
+     *
+     * @param userID the user ID
+     * @return the user
+     */
     @Override
     public User loadUser(String userID) {
         List<User> users = loadData();
@@ -91,6 +130,12 @@ public class FileDataStorage implements IDataStorage {
                    .orElse(null);
     }
 
+    /**
+     * Save user.
+     *
+     * @param user the user
+     * @return true, if successful
+     */
     @Override
     public boolean saveUser(User user) {
         List<User> users = loadData();
@@ -100,6 +145,12 @@ public class FileDataStorage implements IDataStorage {
         return true;
     }
 
+    /**
+     * Delete user.
+     *
+     * @param userID the user ID
+     * @return true, if successful
+     */
     @Override
     public boolean deleteUser(String userID) {
         List<User> users = loadData();
@@ -125,6 +176,11 @@ public class FileDataStorage implements IDataStorage {
         return false;
     }
 
+    /**
+     * Clear all data.
+     *
+     * @return true, if successful
+     */
     @Override
     public boolean clearAllData() {
         File directory = new File(dataDirectory);
@@ -144,6 +200,13 @@ public class FileDataStorage implements IDataStorage {
         return success;
     }
 
+    /**
+     * Save transaction.
+     *
+     * @param userId the user id
+     * @param transaction the transaction
+     * @return true, if successful
+     */
     @Override
     public boolean saveTransaction(String userId, Transaction transaction) {
         List<Transaction> transactions = loadTransactions(userId);
@@ -151,6 +214,12 @@ public class FileDataStorage implements IDataStorage {
         return saveAllTransactions(userId, transactions);
     }
 
+    /**
+     * Load transactions.
+     *
+     * @param userId the user id
+     * @return the list
+     */
     @Override
     @SuppressWarnings("unchecked")
     public List<Transaction> loadTransactions(String userId) {
@@ -166,6 +235,13 @@ public class FileDataStorage implements IDataStorage {
         }
     }
 
+    /**
+     * Save all transactions.
+     *
+     * @param userId the user id
+     * @param transactions the transactions
+     * @return true, if successful
+     */
     private boolean saveAllTransactions(String userId, List<Transaction> transactions) {
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(new File(dataDirectory, userId + "_" + TRANSACTIONS_FILE)))) {
@@ -176,6 +252,13 @@ public class FileDataStorage implements IDataStorage {
         }
     }
 
+    /**
+     * Save budget.
+     *
+     * @param userId the user id
+     * @param budget the budget
+     * @return true, if successful
+     */
     @Override
     public boolean saveBudget(String userId, Budget budget) {
         List<Budget> budgets = loadBudgets(userId);
@@ -193,6 +276,12 @@ public class FileDataStorage implements IDataStorage {
         }
     }
 
+    /**
+     * Load budgets.
+     *
+     * @param userId the user id
+     * @return the list
+     */
     @Override
     @SuppressWarnings("unchecked")
     public List<Budget> loadBudgets(String userId) {

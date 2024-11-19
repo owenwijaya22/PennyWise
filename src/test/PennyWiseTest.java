@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,11 +10,24 @@ import pennywise.model.ExpenseCategory;
 
 import java.io.File;
 
+
+/**
+ * The Class PennyWiseTest.
+ */
 public class PennyWiseTest {
+    
+    /** The pennywise. */
     private PennyWise pennywise;
+    
+    /** The Constant TEST_DATA_DIR. */
     private static final String TEST_DATA_DIR = "./test_data";
+    
+    /** The Constant TEST_USER_ID. */
     private static final String TEST_USER_ID = "testUser";
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         // Clean test directory before creating PennyWise instance
@@ -27,6 +43,9 @@ public class PennyWiseTest {
         pennywise = new PennyWise(TEST_DATA_DIR);
     }
 
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown() {
         // Clean up test data
@@ -39,6 +58,9 @@ public class PennyWiseTest {
         }
     }
 
+    /**
+     * Test user registration and login.
+     */
     @Test
     void testUserRegistrationAndLogin() {
         // Test Case: Verify basic user registration and login flow
@@ -53,6 +75,9 @@ public class PennyWiseTest {
         assertEquals(TEST_USER_ID, pennywise.getCurrentUser().getUserId());
     }
 
+    /**
+     * Test invalid registration.
+     */
     @Test 
     void testInvalidRegistration() {
         // Test Case: Verify system handling of invalid registrations
@@ -66,6 +91,9 @@ public class PennyWiseTest {
         assertFalse(pennywise.registerUser("   "));
     }
 
+    /**
+     * Test duplicate registration.
+     */
     @Test
     void testDuplicateRegistration() {
         // Test Case: Verify system prevents duplicate user registrations
@@ -75,6 +103,9 @@ public class PennyWiseTest {
         assertFalse(pennywise.registerUser(TEST_USER_ID));
     }
 
+    /**
+     * Test delete account.
+     */
     @Test
     void testDeleteAccount() {
         // Test Case: Verify account deletion functionality
@@ -89,6 +120,9 @@ public class PennyWiseTest {
         assertFalse(pennywise.login(TEST_USER_ID));
     }
 
+    /**
+     * Test system error recovery.
+     */
     @Test
     void testSystemErrorRecovery() {
         // Test Case: System stability during error conditions
@@ -107,6 +141,9 @@ public class PennyWiseTest {
         assertTrue(pennywise.isLoggedIn());
     }
 
+    /**
+     * Test get current user when logged out.
+     */
     @Test
     void testGetCurrentUserWhenLoggedOut() {
         // Test Case: Verify getCurrentUser behavior when logged out
@@ -126,6 +163,9 @@ public class PennyWiseTest {
         assertNull(pennywise.getCurrentUser());
     }
 
+    /**
+     * Test delete account when not logged in.
+     */
     @Test
     void testDeleteAccountWhenNotLoggedIn() {
         // Test Case: Verify delete account behavior when not logged in
@@ -141,6 +181,9 @@ public class PennyWiseTest {
         assertFalse(pennywise.deleteAccount());
     }
 
+    /**
+     * Test clear user data when not logged in.
+     */
     @Test
     void testClearUserDataWhenNotLoggedIn() {
         // Test Case: Verify clear user data behavior when not logged in
@@ -156,6 +199,9 @@ public class PennyWiseTest {
         assertFalse(pennywise.clearAllUserData());
     }
 
+    /**
+     * Test console UI integration.
+     */
     @Test
     void testConsoleUIIntegration() {
         // Test Case: Verify PennyWise integration with ConsoleUI
@@ -180,6 +226,9 @@ public class PennyWiseTest {
         assertNull(testPennyWise.getCurrentUser());
     }
 
+    /**
+     * Test invalid login.
+     */
     @Test
     void testInvalidLogin() {
         // Test Case: Verify system handling of invalid login attempts
@@ -196,6 +245,9 @@ public class PennyWiseTest {
         assertFalse(pennywise.isLoggedIn());
     }
 
+    /**
+     * Test negative amount operations.
+     */
     @Test
     void testNegativeAmountOperations() {
         // Test Case: Verify system handling of negative amounts
@@ -214,6 +266,9 @@ public class PennyWiseTest {
         assertTrue(pennywise.updateBudget(150.0));
     }
 
+    /**
+     * Test transaction operations when logged out.
+     */
     @Test
     void testTransactionOperationsWhenLoggedOut() {
         // Test Case: Verify transaction operations when not logged in
@@ -235,6 +290,9 @@ public class PennyWiseTest {
         assertEquals(0.0, pennywise.getCurrentBalance());
     }
 
+    /**
+     * Test delete account cascading effects.
+     */
     @Test
     void testDeleteAccountCascadingEffects() {
         // Test Case: Verify all effects of account deletion
@@ -265,6 +323,9 @@ public class PennyWiseTest {
         assertEquals(0.0, pennywise.getCurrentBalance());
     }
 
+    /**
+     * Test delete account logout behavior.
+     */
     @Test
     void testDeleteAccountLogoutBehavior() {
         // Test Case: Verify logout behavior when account is deleted
@@ -286,6 +347,9 @@ public class PennyWiseTest {
         assertFalse(pennywise.login(TEST_USER_ID));
     }
 
+    /**
+     * Test transaction validation.
+     */
     @Test
     void testTransactionValidation() {
         // Test Case: Verify transaction amount validation
@@ -308,6 +372,9 @@ public class PennyWiseTest {
         assertTrue(pennywise.addTransaction(100.0, ExpenseCategory.FOOD));
     }
 
+    /**
+     * Test budget validation.
+     */
     @Test
     void testBudgetValidation() {
         // Test Case: Verify budget amount validation

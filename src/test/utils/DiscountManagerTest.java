@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,11 +10,23 @@ import java.util.*;
 import java.lang.reflect.Field;
 import pennywise.utils.DiscountManager;
 
+
+/**
+ * The Class DiscountManagerTest.
+ */
 public class DiscountManagerTest {
+
+/** The discount manager. */
 //    private MockDiscountManager discountManager;
 	private DiscountManager discountManager;
+    
+    /** The Constant TEST_CODE. */
     private static final String TEST_CODE = "TEST10";
+    
+    /** The Constant TEST_PERCENTAGE. */
     private static final float TEST_PERCENTAGE = 10.0f;
+    
+    /** The Constant TEST_DESCRIPTION. */
     private static final String TEST_DESCRIPTION = "Test Discount";
 
 //     @BeforeEach
@@ -19,7 +34,12 @@ public class DiscountManagerTest {
 //         discountManager = new MockDiscountManager();
 //     }
 
-    @BeforeEach
+    /**
+ * Sets the up.
+ *
+ * @throws Exception the exception
+ */
+@BeforeEach
     @SuppressWarnings("unchecked")
     void setUp() throws Exception {
         // Reset the singleton instance before each test
@@ -36,6 +56,11 @@ public class DiscountManagerTest {
         ((List<Discount>)discountsField.get(discountManager)).clear();
     }
 
+    /**
+     * Tear down.
+     *
+     * @throws Exception the exception
+     */
     @AfterEach
     void tearDown() throws Exception {
         // Reset the singleton instance after each test
@@ -44,6 +69,9 @@ public class DiscountManagerTest {
         instance.set(null, null);
     }
 
+    /**
+     * Test add valid discount.
+     */
     @Test
     void testAddValidDiscount() {
         // Test Case: Verify valid discount addition
@@ -57,6 +85,9 @@ public class DiscountManagerTest {
         assertEquals(TEST_CODE, discounts.get(0).getCode());
     }
 
+    /**
+     * Test duplicate discount code.
+     */
     @Test
     void testDuplicateDiscountCode() {
         // Test Case: Verify duplicate discount code handling
@@ -72,6 +103,9 @@ public class DiscountManagerTest {
         assertEquals(TEST_PERCENTAGE, discounts.get(0).getPercentage());
     }
 
+    /**
+     * Test find discount by code.
+     */
     @Test
     void testFindDiscountByCode() {
         // Test Case: Verify discount code search functionality
@@ -88,6 +122,9 @@ public class DiscountManagerTest {
         assertNull(notFound);
     }
 
+    /**
+     * Test case insensitive search.
+     */
     @Test
     void testCaseInsensitiveSearch() {
         // Test Case: Verify case-insensitive discount code search
@@ -101,6 +138,9 @@ public class DiscountManagerTest {
         assertEquals(TEST_CODE, found.getCode());
     }
 
+    /**
+     * Test get available discounts immutability.
+     */
     @Test
     void testGetAvailableDiscountsImmutability() {
         // Test Case: Verify list immutability
@@ -115,6 +155,9 @@ public class DiscountManagerTest {
         assertEquals(1, discountManager.getAvailableDiscounts().size());
     }
 
+    /**
+     * Test expired discount.
+     */
     @Test
     void testExpiredDiscount() {
         // Test Case: Verify expired discount handling
@@ -128,6 +171,9 @@ public class DiscountManagerTest {
         assertTrue(discounts.stream().noneMatch(Discount::isValid));
     }
 
+    /**
+     * Test invalid percentages.
+     */
     @Test
     void testInvalidPercentages() {
         // Test Case: Verify percentage bounds
@@ -150,6 +196,9 @@ public class DiscountManagerTest {
         assertFalse(overDiscount.isValid());
     }
 
+    /**
+     * Test special characters in code.
+     */
     @Test
     void testSpecialCharactersInCode() {
         // Test Case: Verify handling of special characters in discount codes
@@ -163,6 +212,9 @@ public class DiscountManagerTest {
         assertEquals("TEST@#$%", found.getCode());
     }
 
+    /**
+     * Test multiple valid discounts.
+     */
     @Test
     void testMultipleValidDiscounts() {
         // Test Case: Verify handling of multiple valid discounts

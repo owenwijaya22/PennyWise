@@ -1,17 +1,37 @@
+/*
+ * 
+ */
 package pennywise.ui.handlers;
 
 import pennywise.PennyWise;
 import pennywise.ui.UIConstants;
 
+
+/**
+ * The Class BudgetHandler.
+ */
 public class BudgetHandler {
+    
+    /** The pennywise. */
     private final PennyWise pennywise;
+    
+    /** The input handler. */
     private final InputHandler inputHandler;
 
+    /**
+     * Instantiates a new budget handler.
+     *
+     * @param pennywise the pennywise
+     * @param inputHandler the input handler
+     */
     public BudgetHandler(PennyWise pennywise, InputHandler inputHandler) {
         this.pennywise = pennywise;
         this.inputHandler = inputHandler;
     }
 
+    /**
+     * Handle create budget.
+     */
     public void handleCreateBudget() {
         if (!pennywise.isLoggedIn() || pennywise.getCurrentUser() == null) {
             System.out.println(UIConstants.LOGIN_PROMPT);
@@ -34,6 +54,9 @@ public class BudgetHandler {
         }
     }
 
+    /**
+     * Handle edit budget.
+     */
     public void handleEditBudget() {
         if (pennywise.getCurrentUser() == null) {
             System.out.println(UIConstants.LOGIN_PROMPT);
@@ -72,6 +95,9 @@ public class BudgetHandler {
         }
     }
 
+    /**
+     * Handle view budgets.
+     */
     public void handleViewBudgets() {
         if (!pennywise.isLoggedIn()) {
             System.out.println(UIConstants.LOGIN_PROMPT);
