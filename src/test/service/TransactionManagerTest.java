@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.service;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,17 +12,33 @@ import pennywise.service.TransactionManager;
 
 import java.util.List;
 
+
+/**
+ * The Class TransactionManagerTest.
+ */
 public class TransactionManagerTest {
+    
+    /** The expense tracker. */
     private TransactionManager expenseTracker;
+    
+    /** The mock storage. */
     private IDataStorage mockStorage;
+    
+    /** The Constant TEST_USER_ID. */
     private static final String TEST_USER_ID = "testUser";
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         mockStorage = new MockDataStorage();
         expenseTracker = new TransactionManager(mockStorage);
     }
 
+    /**
+     * Test add valid expense.
+     */
     @Test
     void testAddValidExpense() {
         // Test Case: Verify valid expense transaction creation
@@ -37,6 +56,9 @@ public class TransactionManagerTest {
         assertEquals(ExpenseCategory.FOOD, transactions.get(0).getCategory());
     }
 
+    /**
+     * Test add valid income.
+     */
     @Test
     void testAddValidIncome() {
         // Test Case: Verify valid income transaction creation
@@ -54,6 +76,9 @@ public class TransactionManagerTest {
         assertEquals(IncomeCategory.SALARY, transactions.get(0).getCategory());
     }
 
+    /**
+     * Test add invalid transaction.
+     */
     @Test
     void testAddInvalidTransaction() {
         // Test Case: Verify handling of invalid transaction amounts
@@ -69,6 +94,9 @@ public class TransactionManagerTest {
         assertTrue(transactions.isEmpty());
     }
 
+    /**
+     * Test multiple transactions.
+     */
     @Test
     void testMultipleTransactions() {
         // Test Case: Verify multiple transaction handling

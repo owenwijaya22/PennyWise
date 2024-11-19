@@ -1,16 +1,45 @@
+/*
+ * 
+ */
 package pennywise.ui.handlers;
 
 import pennywise.PennyWise;
 import pennywise.ui.*;
 
+
+/**
+ * The Class MenuHandler.
+ */
 public class MenuHandler {
+    
+    /** The pennywise. */
     private final PennyWise pennywise;
+    
+    /** The input handler. */
     private final InputHandler inputHandler;
+    
+    /** The transaction handler. */
     private final TransactionHandler transactionHandler;
+    
+    /** The budget handler. */
     private final BudgetHandler budgetHandler;
+    
+    /** The discount handler. */
     private final DiscountHandler discountHandler;
+    
+    /** The account handler. */
     private final AccountHandler accountHandler;
 
+    /**
+     * Instantiates a new menu handler.
+     *
+     * @param pennywise the pennywise
+     * @param inputHandler the input handler
+     * @param transactionHandler the transaction handler
+     * @param budgetHandler the budget handler
+     * @param discountHandler the discount handler
+     * @param accountHandler the account handler
+     */
     public MenuHandler(PennyWise pennywise, InputHandler inputHandler, 
                       TransactionHandler transactionHandler,
                       BudgetHandler budgetHandler,
@@ -24,6 +53,9 @@ public class MenuHandler {
         this.accountHandler = accountHandler;
     }
 
+    /**
+     * Handle login menu.
+     */
     public void handleLoginMenu() {
         System.out.println(UIConstants.LOGIN_MENU_TITLE);
         for (String option : UIConstants.LOGIN_MENU_OPTIONS) {
@@ -54,6 +86,9 @@ public class MenuHandler {
         }
     }
 
+    /**
+     * Handle main menu.
+     */
     public void handleMainMenu() {
         System.out.println(UIConstants.MAIN_MENU_TITLE);
         for (String option : UIConstants.MAIN_MENU_OPTIONS) {

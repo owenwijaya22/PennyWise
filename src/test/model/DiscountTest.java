@@ -1,14 +1,31 @@
+/*
+ * 
+ */
 package test.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.*;
 import java.util.*;
 import pennywise.model.Discount;
+
+
+/**
+ * The Class DiscountTest.
+ */
 public class DiscountTest {
+    
+    /** The Constant TEST_CODE. */
     private static final String TEST_CODE = "SAVE20";
+    
+    /** The Constant TEST_PERCENTAGE. */
     private static final float TEST_PERCENTAGE = 20.0f;
+    
+    /** The Constant TEST_DESCRIPTION. */
     private static final String TEST_DESCRIPTION = "Test discount";
 
+    /**
+     * Test valid discount.
+     */
     @Test
     void testValidDiscount() {
         // Test Case: Verify valid discount creation and validation
@@ -30,6 +47,9 @@ public class DiscountTest {
         assertEquals(futureDate, discount.getExpiryDate());
     }
 
+    /**
+     * Test expired discount.
+     */
     @Test
     void testExpiredDiscount() {
         // Test Case: Verify expired discount handling
@@ -45,6 +65,9 @@ public class DiscountTest {
         assertFalse(discount.isValid());
     }
 
+    /**
+     * Test invalid percentages.
+     */
     @Test
     void testInvalidPercentages() {
         // Test Case: Verify percentage validation
@@ -68,6 +91,9 @@ public class DiscountTest {
         assertFalse(overHundredDiscount.isValid());
     }
 
+    /**
+     * Test boundary percentages.
+     */
     @Test
     void testBoundaryPercentages() {
         // Test Case: Verify percentage boundary conditions

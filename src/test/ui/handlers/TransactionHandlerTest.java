@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.ui.handlers;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,15 +15,36 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 
+
+/**
+ * The Class TransactionHandlerTest.
+ */
 public class TransactionHandlerTest {
+    
+    /** The transaction handler. */
     private TransactionHandler transactionHandler;
+    
+    /** The mock pennywise. */
     private MockPennyWise mockPennywise;
+    
+    /** The mock input handler. */
     private MockInputHandler mockInputHandler;
+    
+    /** The mock analyzer. */
     private MockTransactionAnalyzer mockAnalyzer;
+    
+    /** The mock discount manager. */
     private MockDiscountManager mockDiscountManager;
+    
+    /** The output stream. */
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    
+    /** The original out. */
     private final PrintStream originalOut = System.out;
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         mockPennywise = new MockPennyWise();
@@ -34,12 +58,18 @@ public class TransactionHandlerTest {
         mockPennywise.logout();
     }
 
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown() {
         System.setOut(originalOut);
         mockDiscountManager.clearDiscounts();
     }
 
+    /**
+     * Test add expense without discount.
+     */
     @Test
     void testAddExpenseWithoutDiscount() {
         // Test Case: Adding expense without applying discount
@@ -59,6 +89,9 @@ public class TransactionHandlerTest {
         assertEquals(-100.0, mockPennywise.getTotalExpenses());
     }
 
+    /**
+     * Test add expense with valid discount.
+     */
     @Test
     void testAddExpenseWithValidDiscount() {
         // Test Case: Adding expense with valid discount code
@@ -84,6 +117,9 @@ public class TransactionHandlerTest {
         assertEquals(-90.0, mockPennywise.getTotalExpenses(), 0.01); // Allow small delta for floating point precision
     }
 
+    /**
+     * Test add expense with invalid amount.
+     */
     @Test
     void testAddExpenseWithInvalidAmount() {
         // Test Case: Handling invalid expense amount
@@ -101,6 +137,9 @@ public class TransactionHandlerTest {
         assertEquals(0.0, mockPennywise.getTotalExpenses());
     }
 
+    /**
+     * Test add income.
+     */
     @Test
     void testAddIncome() {
         // Test Case: Adding valid income transaction
@@ -119,6 +158,9 @@ public class TransactionHandlerTest {
         assertEquals(1000.0, mockPennywise.getTotalIncome());
     }
 
+    /**
+     * Test add income with invalid amount.
+     */
     @Test
     void testAddIncomeWithInvalidAmount() {
         // Test Case: Handling invalid income amount
@@ -136,6 +178,9 @@ public class TransactionHandlerTest {
         assertEquals(0.0, mockPennywise.getTotalIncome());
     }
 
+    /**
+     * Test add income without login.
+     */
     @Test
     void testAddIncomeWithoutLogin() {
         // Test Case: Adding income without user login
@@ -153,6 +198,9 @@ public class TransactionHandlerTest {
         assertEquals(0.0, mockPennywise.getTotalIncome());
     }
 
+    /**
+     * Test view transactions empty.
+     */
     @Test
     void testViewTransactionsEmpty() {
         // Test Case: Viewing transactions with empty history
@@ -167,6 +215,9 @@ public class TransactionHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.NO_TRANSACTIONS_MESSAGE));
     }
 
+    /**
+     * Test view transactions with data.
+     */
     @Test
     void testViewTransactionsWithData() {
         // Test Case: Viewing transactions with existing data
@@ -197,6 +248,9 @@ public class TransactionHandlerTest {
         assertTrue(output.contains(ExpenseCategory.FOOD.getCategoryName()));
     }
 
+    /**
+     * Test view monthly expenses no login.
+     */
     @Test
     void testViewMonthlyExpensesNoLogin() {
         // Test Case: Viewing monthly expenses without login
@@ -213,6 +267,9 @@ public class TransactionHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.LOGIN_PROMPT_MONTHLY_EXPENSES));
     }
 
+    /**
+     * Test view monthly expenses empty.
+     */
     @Test
     void testViewMonthlyExpensesEmpty() {
         // Test Case: Viewing monthly expenses with no data
@@ -227,6 +284,9 @@ public class TransactionHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.NO_EXPENSES_MESSAGE));
     }
 
+    /**
+     * Test view monthly incomes no login.
+     */
     @Test
     void testViewMonthlyIncomesNoLogin() {
         // Test Case: Viewing monthly incomes without login
@@ -243,6 +303,9 @@ public class TransactionHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.LOGIN_PROMPT_MONTHLY_EXPENSES));
     }
 
+    /**
+     * Test view monthly incomes empty.
+     */
     @Test
     void testViewMonthlyIncomesEmpty() {
         // Test Case: Viewing monthly incomes with no data
@@ -257,6 +320,9 @@ public class TransactionHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.NO_INCOMES_MESSAGE));
     }
 
+    /**
+     * Test view incomes by category no login.
+     */
     @Test
     void testViewIncomesByCategoryNoLogin() {
         // Test Case: Viewing income categories without login
@@ -271,6 +337,9 @@ public class TransactionHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.LOGIN_PROMPT_INCOMES_CATEGORY));
     }
 
+    /**
+     * Test view expenses by category no login.
+     */
     @Test
     void testViewExpensesByCategoryNoLogin() {
         // Test Case: Viewing expense categories without login
@@ -285,6 +354,9 @@ public class TransactionHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.LOGIN_PROMPT_EXPENSES_CATEGORY));
     }
 
+    /**
+     * Test view expenses by category empty.
+     */
     @Test
     void testViewExpensesByCategoryEmpty() {
         // Test Case: Viewing expense categories with no data
@@ -299,6 +371,9 @@ public class TransactionHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.NO_EXPENSES_MESSAGE));
     }
 
+    /**
+     * Test view incomes by category empty.
+     */
     @Test
     void testViewIncomesByCategoryEmpty() {
         // Test Case: Viewing income categories with no data
@@ -313,6 +388,9 @@ public class TransactionHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.NO_INCOMES_MESSAGE));
     }
 
+    /**
+     * Test view balance.
+     */
     @Test
     void testViewBalance() {
         // Test Case: Viewing current balance with transactions
@@ -330,6 +408,9 @@ public class TransactionHandlerTest {
         assertEquals(500.0, mockPennywise.getCurrentBalance());
     }
 
+    /**
+     * Test view incomes by category with data.
+     */
     @Test
     void testViewIncomesByCategoryWithData() {
         // Test Case: Viewing income categories with existing data
@@ -362,6 +443,9 @@ public class TransactionHandlerTest {
         assertTrue(output.contains(String.format("%.2f", 500.0)));
     }
 
+    /**
+     * Test view expenses by category with data.
+     */
     @Test
     void testViewExpensesByCategoryWithData() {
         // Test Case: Viewing expense categories with existing data
@@ -393,6 +477,9 @@ public class TransactionHandlerTest {
         assertTrue(output.contains(String.format("%.2f", 300.0)));
     }
 
+    /**
+     * Test view monthly expenses with data.
+     */
     @Test
     void testViewMonthlyExpensesWithData() {
         // Test Case: Viewing monthly expenses with existing data
@@ -423,6 +510,9 @@ public class TransactionHandlerTest {
         assertTrue(output.contains(String.format("%.2f", 300.0)));
     }
 
+    /**
+     * Test view monthly incomes with data.
+     */
     @Test
     void testViewMonthlyIncomesWithData() {
         // Test Case: Viewing monthly incomes with existing data

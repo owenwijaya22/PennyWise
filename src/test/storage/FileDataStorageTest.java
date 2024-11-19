@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.storage;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,17 +10,33 @@ import pennywise.storage.FileDataStorage;
 import java.io.*;
 import java.nio.file.*;
 
+
+/**
+ * The Class FileDataStorageTest.
+ */
 public class FileDataStorageTest {
+    
+    /** The Constant TEST_DATA_DIR. */
     private static final String TEST_DATA_DIR = "./test_data";
+    
+    /** The storage. */
     private FileDataStorage storage;
+    
+    /** The Constant TEST_USER_ID. */
     private static final String TEST_USER_ID = "testUser";
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         cleanTestDirectory();
         storage = new FileDataStorage(TEST_DATA_DIR);
     }
 
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown() {
         // Make directory writable again before cleanup
@@ -28,6 +47,9 @@ public class FileDataStorageTest {
         cleanTestDirectory();
     }
 
+    /**
+     * Clean test directory.
+     */
     private void cleanTestDirectory() {
         try {
             Path directory = Paths.get(TEST_DATA_DIR);
@@ -47,6 +69,11 @@ public class FileDataStorageTest {
         }
     }
 
+    /**
+     * Make writable.
+     *
+     * @param file the file
+     */
     private void makeWritable(File file) {
         if (file.isDirectory()) {
             File[] files = file.listFiles();
@@ -59,6 +86,11 @@ public class FileDataStorageTest {
         file.setWritable(true);
     }
 
+    /**
+     * Test corrupted user file.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     void testCorruptedUserFile() throws IOException {
         // Create a corrupted users file
@@ -72,6 +104,11 @@ public class FileDataStorageTest {
         assertTrue(storage.loadData().isEmpty());
     }
 
+    /**
+     * Test corrupted transaction file.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     @Test
     void testCorruptedTransactionFile() throws IOException {
         // Create a corrupted transactions file
@@ -85,6 +122,9 @@ public class FileDataStorageTest {
         assertTrue(storage.loadTransactions(TEST_USER_ID).isEmpty());
     }
 
+    /**
+     * Test delete non existent user.
+     */
     @Test
     void testDeleteNonExistentUser() {
         // Attempt to delete a user that doesn't exist

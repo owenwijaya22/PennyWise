@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,11 +12,24 @@ import java.util.*;
 import pennywise.PennyWise;
 import java.io.File;
 
+
+/**
+ * The Class PennyWiseIntegrationTest.
+ */
 public class PennyWiseIntegrationTest {
+    
+    /** The pennywise. */
     private PennyWise pennywise;
+    
+    /** The Constant TEST_DATA_DIR. */
     private static final String TEST_DATA_DIR = "./test_integration_data";
+    
+    /** The Constant TEST_USER_ID. */
     private static final String TEST_USER_ID = "testUser";
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         // Clean test directory before creating PennyWise instance
@@ -29,6 +45,9 @@ public class PennyWiseIntegrationTest {
         pennywise = new PennyWise(TEST_DATA_DIR);
     }
 
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown() {
         // Clean up test data after each test
@@ -41,6 +60,9 @@ public class PennyWiseIntegrationTest {
         }
     }
 
+    /**
+     * Test budget and transaction integration.
+     */
     @Test
     void testBudgetAndTransactionIntegration() {
         // Test Case: Budget and Transaction component integration
@@ -61,6 +83,9 @@ public class PennyWiseIntegrationTest {
         assertEquals(1000.0, pennywise.getBudgetManager().getCurrentMonthBudget(TEST_USER_ID));
     }
 
+    /**
+     * Test storage and analyzer integration.
+     */
     @Test
     void testStorageAndAnalyzerIntegration() {
         // Test Case: Storage and Analyzer component integration
@@ -82,6 +107,9 @@ public class PennyWiseIntegrationTest {
         assertEquals(1000.0, analyzer.getTotalIncome());
     }
 
+    /**
+     * Test complete component integration.
+     */
     @Test
     void testCompleteComponentIntegration() {
         // Test Case: Full system component integration
@@ -110,6 +138,9 @@ public class PennyWiseIntegrationTest {
         assertEquals(300.0, expensesByCategory.get(ExpenseCategory.TRANSPORTATION)); // Now negative
     }
 
+    /**
+     * Test user data management.
+     */
     @Test
     void testUserDataManagement() {
         // Test user data clearing and application reset
@@ -133,6 +164,9 @@ public class PennyWiseIntegrationTest {
         assertFalse(pennywise.login("anotherUser"));
     }
 
+    /**
+     * Test transaction analysis.
+     */
     @Test
     void testTransactionAnalysis() {
         assertTrue(pennywise.registerUser(TEST_USER_ID));
@@ -159,6 +193,9 @@ public class PennyWiseIntegrationTest {
         assertEquals(0.0, pennywise.getTotalIncome());
     }
 
+    /**
+     * Test budget management.
+     */
     @Test
     void testBudgetManagement() {
         assertTrue(pennywise.registerUser(TEST_USER_ID));
@@ -177,6 +214,9 @@ public class PennyWiseIntegrationTest {
         assertFalse(pennywise.updateBudget(-50.0));
     }
 
+    /**
+     * Test transaction management.
+     */
     @Test
     void testTransactionManagement() {
         assertTrue(pennywise.registerUser(TEST_USER_ID));
@@ -206,6 +246,9 @@ public class PennyWiseIntegrationTest {
         assertFalse(pennywise.addTransaction(100.0, ExpenseCategory.FOOD));
     }
 
+    /**
+     * Test main method initialization.
+     */
     @Test
     void testMainMethodInitialization() {
         // Test Case: Verify main method initialization

@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.ui.handlers;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,17 +12,42 @@ import test.stubs.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+
+/**
+ * The Class MenuHandlerTest.
+ */
 public class MenuHandlerTest {
+    
+    /** The menu handler. */
     private MenuHandler menuHandler;
+    
+    /** The mock pennywise. */
     private MockPennyWise mockPennywise;
+    
+    /** The mock input handler. */
     private MockInputHandler mockInputHandler;
+    
+    /** The mock transaction handler. */
     private MockTransactionHandler mockTransactionHandler;
+    
+    /** The mock budget handler. */
     private MockBudgetHandler mockBudgetHandler;
+    
+    /** The mock discount handler. */
     private MockDiscountHandler mockDiscountHandler;
+    
+    /** The mock account handler. */
     private MockAccountHandler mockAccountHandler;
+    
+    /** The output stream. */
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    
+    /** The original out. */
     private final PrintStream originalOut = System.out;
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         mockPennywise = new MockPennyWise();
@@ -34,11 +62,17 @@ public class MenuHandlerTest {
         System.setOut(new PrintStream(outputStream));
     }
 
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown() {
         System.setOut(originalOut);
     }
 
+    /**
+     * Test login menu valid login.
+     */
     @Test
     void testLoginMenuValidLogin() {
         // Test Case: Verify successful login option
@@ -50,6 +84,9 @@ public class MenuHandlerTest {
         assertTrue(mockAccountHandler.wasLoginCalled());
     }
 
+    /**
+     * Test login menu valid registration.
+     */
     @Test
     void testLoginMenuValidRegistration() {
         // Test Case: Verify successful registration option
@@ -61,6 +98,9 @@ public class MenuHandlerTest {
         assertTrue(mockAccountHandler.wasRegistrationCalled());
     }
 
+    /**
+     * Test login menu invalid option.
+     */
     @Test
     void testLoginMenuInvalidOption() {
         // Test Case: Verify handling of invalid login menu option
@@ -72,6 +112,9 @@ public class MenuHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.INVALID_INPUT_MESSAGE));
     }
 
+    /**
+     * Test main menu add expense.
+     */
     @Test
     void testMainMenuAddExpense() {
         // Test Case: Verify add expense option
@@ -83,6 +126,9 @@ public class MenuHandlerTest {
         assertTrue(mockTransactionHandler.wasAddExpenseCalled());
     }
 
+    /**
+     * Test main menu add income.
+     */
     @Test
     void testMainMenuAddIncome() {
         // Test Case: Verify add income option
@@ -94,6 +140,9 @@ public class MenuHandlerTest {
         assertTrue(mockTransactionHandler.wasAddIncomeCalled());
     }
 
+    /**
+     * Test main menu view transactions.
+     */
     @Test
     void testMainMenuViewTransactions() {
         // Test Case: Verify view transactions option
@@ -105,6 +154,9 @@ public class MenuHandlerTest {
         assertTrue(mockTransactionHandler.wasViewTransactionsCalled());
     }
 
+    /**
+     * Test main menu view monthly expenses.
+     */
     @Test
     void testMainMenuViewMonthlyExpenses() {
         // Test Case: Verify view monthly expenses option
@@ -116,6 +168,9 @@ public class MenuHandlerTest {
         assertTrue(mockTransactionHandler.wasViewMonthlyExpensesCalled());
     }
 
+    /**
+     * Test main menu view monthly incomes.
+     */
     @Test
     void testMainMenuViewMonthlyIncomes() {
         // Test Case: Verify view monthly incomes option
@@ -127,6 +182,9 @@ public class MenuHandlerTest {
         assertTrue(mockTransactionHandler.wasViewMonthlyIncomesCalled());
     }
 
+    /**
+     * Test main menu view expenses by category.
+     */
     @Test
     void testMainMenuViewExpensesByCategory() {
         // Test Case: Verify view expenses by category option
@@ -138,6 +196,9 @@ public class MenuHandlerTest {
         assertTrue(mockTransactionHandler.wasViewExpensesByCategoryCalled());
     }
 
+    /**
+     * Test main menu view incomes by category.
+     */
     @Test
     void testMainMenuViewIncomesByCategory() {
         // Test Case: Verify view incomes by category option
@@ -149,6 +210,9 @@ public class MenuHandlerTest {
         assertTrue(mockTransactionHandler.wasViewIncomesByCategoryCalled());
     }
 
+    /**
+     * Test main menu create budget.
+     */
     @Test
     void testMainMenuCreateBudget() {
         // Test Case: Verify create budget option
@@ -160,6 +224,9 @@ public class MenuHandlerTest {
         assertTrue(mockBudgetHandler.wasCreateBudgetCalled());
     }
 
+    /**
+     * Test main menu edit budget.
+     */
     @Test
     void testMainMenuEditBudget() {
         // Test Case: Verify edit budget option
@@ -171,6 +238,9 @@ public class MenuHandlerTest {
         assertTrue(mockBudgetHandler.wasEditBudgetCalled());
     }
 
+    /**
+     * Test main menu view budgets.
+     */
     @Test
     void testMainMenuViewBudgets() {
         // Test Case: Verify view budgets option
@@ -182,6 +252,9 @@ public class MenuHandlerTest {
         assertTrue(mockBudgetHandler.wasViewBudgetsCalled());
     }
 
+    /**
+     * Test main menu view balance.
+     */
     @Test
     void testMainMenuViewBalance() {
         // Test Case: Verify view balance option
@@ -193,6 +266,9 @@ public class MenuHandlerTest {
         assertTrue(mockTransactionHandler.wasViewBalanceCalled());
     }
 
+    /**
+     * Test main menu discount visualization.
+     */
     @Test
     void testMainMenuDiscountVisualization() {
         // Test Case: Verify discount visualization option
@@ -204,6 +280,9 @@ public class MenuHandlerTest {
         assertTrue(mockDiscountHandler.wasDiscountVisualizationCalled());
     }
 
+    /**
+     * Test main menu account management.
+     */
     @Test
     void testMainMenuAccountManagement() {
         // Test Case: Verify account management option
@@ -215,6 +294,9 @@ public class MenuHandlerTest {
         assertTrue(mockAccountHandler.wasAccountManagementCalled());
     }
 
+    /**
+     * Test main menu logout.
+     */
     @Test
     void testMainMenuLogout() {
         // Test Case: Verify logout functionality
@@ -226,6 +308,9 @@ public class MenuHandlerTest {
         assertTrue(mockPennywise.wasLogoutCalled());
     }
 
+    /**
+     * Test main menu invalid option.
+     */
     @Test
     void testMainMenuInvalidOption() {
         // Test Case: Verify handling of invalid main menu option

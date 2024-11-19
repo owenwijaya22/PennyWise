@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.ui.handlers;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,13 +13,30 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 
+
+/**
+ * The Class DiscountHandlerTest.
+ */
 public class DiscountHandlerTest {
+    
+    /** The discount handler. */
     private DiscountHandler discountHandler;
+    
+    /** The mock input handler. */
     private MockInputHandler mockInputHandler;
+    
+    /** The mock discount manager. */
     private MockDiscountManager mockDiscountManager;
+    
+    /** The output stream. */
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    
+    /** The original out. */
     private final PrintStream originalOut = System.out;
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         mockInputHandler = new MockInputHandler();
@@ -26,12 +46,18 @@ public class DiscountHandlerTest {
         outputStream.reset();
     }
 
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown() {
         System.setOut(originalOut);
         mockDiscountManager.clearDiscounts();
     }
 
+    /**
+     * Test display discounts empty.
+     */
     @Test
     void testDisplayDiscountsEmpty() {
         // Test Case: Verify display of empty discount list
@@ -48,6 +74,9 @@ public class DiscountHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.NO_DISCOUNTS_MESSAGE));
     }
 
+    /**
+     * Test display discounts with valid discounts.
+     */
     @Test
     void testDisplayDiscountsWithValidDiscounts() {
         // Test Case: Verify display of existing discounts
@@ -70,6 +99,9 @@ public class DiscountHandlerTest {
         assertTrue(output.contains("Test Discount"), "Should display discount description");
     }
 
+    /**
+     * Test add custom discount success.
+     */
     @Test
     void testAddCustomDiscountSuccess() {
         // Test Case: Verify successful addition of custom discount
@@ -98,6 +130,9 @@ public class DiscountHandlerTest {
         assertEquals("Test Description", addedDiscount.getDescription(), "Discount description should match input");
     }
 
+    /**
+     * Test add predetermined discount.
+     */
     @Test
     void testAddPredeterminedDiscount() {
         // Test Case: Verify adding a predetermined discount
@@ -118,6 +153,9 @@ public class DiscountHandlerTest {
         assertEquals(10.0f, addedDiscount.getPercentage(), "Discount percentage should match");
     }
 
+    /**
+     * Test invalid menu option.
+     */
     @Test
     void testInvalidMenuOption() {
         // Test Case: Verify handling of invalid menu options
@@ -135,6 +173,9 @@ public class DiscountHandlerTest {
                    "Should display invalid option message");
     }
 
+    /**
+     * Test exit option.
+     */
     @Test
     void testExitOption() {
         // Test Case: Verify menu exit functionality
@@ -151,6 +192,9 @@ public class DiscountHandlerTest {
                    "Should display menu title before exit");
     }
 
+    /**
+     * Test add duplicate discount.
+     */
     @Test
     void testAddDuplicateDiscount() {
         // Test Case: Verify handling of duplicate discount codes
@@ -186,6 +230,9 @@ public class DiscountHandlerTest {
         assertEquals(1, mockDiscountManager.getAvailableDiscounts().size(), "Should only have one discount");
     }
 
+    /**
+     * Test handle discount code valid.
+     */
     @Test
     void testHandleDiscountCodeValid() {
         // Test Case: Verify applying a valid discount code
@@ -206,6 +253,9 @@ public class DiscountHandlerTest {
         assertTrue(output.contains("$25.00"), "Should display correct discount amount");
     }
 
+    /**
+     * Test handle discount code invalid.
+     */
     @Test
     void testHandleDiscountCodeInvalid() {
         // Test Case: Verify handling invalid discount code
@@ -220,6 +270,9 @@ public class DiscountHandlerTest {
         assertTrue(outputStream.toString().contains(UIConstants.INVALID_DISCOUNT_MESSAGE));
     }
 
+    /**
+     * Test handle discount code expired.
+     */
     @Test
     void testHandleDiscountCodeExpired() {
         // Test Case: Verify handling expired discount code

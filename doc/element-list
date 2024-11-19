@@ -1,0 +1,15 @@
+pennywise
+pennywise.interfaces
+pennywise.model
+pennywise.service
+pennywise.storage
+pennywise.ui
+pennywise.ui.handlers
+pennywise.utils
+test
+test.model
+test.service
+test.storage
+test.stubs
+test.ui.handlers
+test.utils

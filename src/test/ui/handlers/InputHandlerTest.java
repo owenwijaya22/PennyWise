@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.ui.handlers;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,21 +11,40 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+
+/**
+ * The Class InputHandlerTest.
+ */
 public class InputHandlerTest {
+    
+    /** The input handler. */
     private InputHandler inputHandler;
+    
+    /** The output stream. */
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    
+    /** The original out. */
     private final PrintStream originalOut = System.out;
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         System.setOut(new PrintStream(outputStream));
     }
 
+    /**
+     * Tear down.
+     */
     @AfterEach
     void tearDown() {
         System.setOut(originalOut);
     }
 
+    /**
+     * Test read int valid input.
+     */
     @Test
     void testReadIntValidInput() {
         // Test Case: Verify reading valid integer input
@@ -38,6 +60,9 @@ public class InputHandlerTest {
         inputHandler.close();
     }
 
+    /**
+     * Test read int invalid input.
+     */
     @Test
     void testReadIntInvalidInput() {
         // Test Case: Verify handling of invalid integer input
@@ -53,6 +78,9 @@ public class InputHandlerTest {
         inputHandler.close();
     }
 
+    /**
+     * Test read double valid input.
+     */
     @Test
     void testReadDoubleValidInput() {
         // Test Case: Verify reading valid double input
@@ -68,6 +96,9 @@ public class InputHandlerTest {
         inputHandler.close();
     }
 
+    /**
+     * Test read double invalid input.
+     */
     @Test
     void testReadDoubleInvalidInput() {
         // Test Case: Verify handling of invalid double input
@@ -83,6 +114,9 @@ public class InputHandlerTest {
         inputHandler.close();
     }
 
+    /**
+     * Test read float valid input.
+     */
     @Test
     void testReadFloatValidInput() {
         // Test Case: Verify reading valid float input
@@ -98,6 +132,9 @@ public class InputHandlerTest {
         inputHandler.close();
     }
 
+    /**
+     * Test read float invalid input.
+     */
     @Test
     void testReadFloatInvalidInput() {
         // Test Case: Verify handling of invalid float input
@@ -113,6 +150,9 @@ public class InputHandlerTest {
         inputHandler.close();
     }
 
+    /**
+     * Test read line.
+     */
     @Test
     void testReadLine() {
         // Test Case: Verify reading string input
@@ -128,6 +168,9 @@ public class InputHandlerTest {
         inputHandler.close();
     }
 
+    /**
+     * Test ask yes no positive.
+     */
     @Test
     void testAskYesNoPositive() {
         // Test Case: Verify handling of positive Y/N response
@@ -145,6 +188,9 @@ public class InputHandlerTest {
         inputHandler.close();
     }
 
+    /**
+     * Test ask yes no negative.
+     */
     @Test
     void testAskYesNoNegative() {
         // Test Case: Verify handling of negative Y/N response
@@ -162,6 +208,11 @@ public class InputHandlerTest {
         inputHandler.close();
     }
 
+    /**
+     * Provide input.
+     *
+     * @param data the data
+     */
     private void provideInput(String data) {
         ByteArrayInputStream testIn = new ByteArrayInputStream(data.getBytes());
         System.setIn(testIn);

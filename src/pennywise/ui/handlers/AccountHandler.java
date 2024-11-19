@@ -1,22 +1,49 @@
+/*
+ * 
+ */
 package pennywise.ui.handlers;
 
 import pennywise.PennyWise;
 import pennywise.ui.UIConstants;
 
+
+/**
+ * The Class AccountHandler.
+ */
 public class AccountHandler {
+    
+    /** The pennywise. */
     private final PennyWise pennywise;
+    
+    /** The input handler. */
     private final InputHandler inputHandler;
+    
+    /** The menu handler. */
     private MenuHandler menuHandler;
 
+    /**
+     * Instantiates a new account handler.
+     *
+     * @param pennywise the pennywise
+     * @param inputHandler the input handler
+     */
     public AccountHandler(PennyWise pennywise, InputHandler inputHandler) {
         this.pennywise = pennywise;
         this.inputHandler = inputHandler;
     }
 
+    /**
+     * Sets the menu handler.
+     *
+     * @param menuHandler the new menu handler
+     */
     public void setMenuHandler(MenuHandler menuHandler) {
         this.menuHandler = menuHandler;
     }
 
+    /**
+     * Handle login.
+     */
     public void handleLogin() {
         System.out.print(UIConstants.ENTER_USER_ID_PROMPT);
         String userId = inputHandler.readLine();
@@ -28,6 +55,9 @@ public class AccountHandler {
         }
     }
 
+    /**
+     * Handle registration.
+     */
     public void handleRegistration() {
         System.out.print(UIConstants.ENTER_NEW_USER_ID_PROMPT);
         String userId = inputHandler.readLine();
@@ -39,6 +69,9 @@ public class AccountHandler {
         }
     }
 
+    /**
+     * Handle account management.
+     */
     public void handleAccountManagement() {
         System.out.println(UIConstants.ACCOUNT_MANAGEMENT_TITLE);
         for (String option : UIConstants.ACCOUNT_MENU_OPTIONS) {

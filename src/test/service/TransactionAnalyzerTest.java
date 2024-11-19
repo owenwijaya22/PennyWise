@@ -1,3 +1,6 @@
+/*
+ * 
+ */
 package test.service;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,17 +12,33 @@ import pennywise.model.IncomeCategory;
 import java.util.*;
 import pennywise.service.TransactionAnalyzer;
 
+
+/**
+ * The Class TransactionAnalyzerTest.
+ */
 public class TransactionAnalyzerTest {
+    
+    /** The analyzer. */
     private TransactionAnalyzer analyzer;
+    
+    /** The Constant TEST_USER_ID. */
     private static final String TEST_USER_ID = "testUser";
+    
+    /** The test transactions. */
     private List<Transaction> testTransactions;
 
+    /**
+     * Sets the up.
+     */
     @BeforeEach
     void setUp() {
         testTransactions = new ArrayList<>();
         analyzer = new TransactionAnalyzer(testTransactions);
     }
 
+    /**
+     * Test expense analysis.
+     */
     @Test
     void testExpenseAnalysis() {
         // Test Case: Verify expense analysis functionality
@@ -42,6 +61,9 @@ public class TransactionAnalyzerTest {
         assertEquals(450.0, analyzer.getTotalExpenses());                           // 300 + 150
     }
 
+    /**
+     * Test income analysis.
+     */
     @Test
     void testIncomeAnalysis() {
         // Test Case: Verify income analysis functionality
@@ -62,6 +84,9 @@ public class TransactionAnalyzerTest {
         assertEquals(1500.0, analyzer.getTotalIncome());                            // 1000 + 500
     }
 
+    /**
+     * Test category percentages.
+     */
     @Test
     void testCategoryPercentages() {
         // Test Case: Verify percentage calculations for transaction categories
@@ -80,6 +105,9 @@ public class TransactionAnalyzerTest {
         assertEquals(75.0, percentages.get(ExpenseCategory.TRANSPORTATION)); // 300 / 400 * 100
     }
 
+    /**
+     * Test mixed transactions.
+     */
     @Test
     void testMixedTransactions() {
         // Test Case: Verify analyzer handles both income and expenses correctly
@@ -94,6 +122,9 @@ public class TransactionAnalyzerTest {
         assertEquals(500.0, analyzer.getNetAmount()); // 1000 - 500
     }
 
+    /**
+     * Test empty transaction list.
+     */
     @Test
     void testEmptyTransactionList() {
         // Test Case: Verify analyzer behavior with empty transaction list
@@ -109,6 +140,9 @@ public class TransactionAnalyzerTest {
         assertEquals(0.0, analyzer.getNetAmount());
     }
 
+    /**
+     * Test monthly income.
+     */
     @Test
     void testMonthlyIncome() {
         // Test Case: Verify monthly income aggregation
@@ -123,6 +157,9 @@ public class TransactionAnalyzerTest {
         assertEquals(2700.0, currentMonthTotal); // 1000 + 500 + 1200
     }
 
+    /**
+     * Test monthly expenses.
+     */
     @Test
     void testMonthlyExpenses() {
         // Test Case: Verify monthly expense aggregation
@@ -137,6 +174,9 @@ public class TransactionAnalyzerTest {
         assertEquals(650.0, currentMonthTotal); // 150 + 200 + 300
     }
 
+    /**
+     * Test income filtering with mixed transactions.
+     */
     @Test
     void testIncomeFilteringWithMixedTransactions() {
         // Test income filtering with mixed transaction types
@@ -161,6 +201,9 @@ public class TransactionAnalyzerTest {
         assertFalse(incomeByCategory.containsKey(ExpenseCategory.TRANSPORTATION));
     }
 
+    /**
+     * Test category percentages edge cases.
+     */
     @Test
     void testCategoryPercentagesEdgeCases() {
         // Test with empty transaction list
