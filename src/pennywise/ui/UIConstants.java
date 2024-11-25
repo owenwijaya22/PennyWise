@@ -123,7 +123,7 @@ public final class UIConstants {
     public static final String EXPENSE_SUCCESS_MESSAGE = "Expense added successfully!";
     
     /** The Constant EXPENSE_FAILED_MESSAGE. */
-    public static final String EXPENSE_FAILED_MESSAGE = "Failed to add expense.";
+    public static final String EXPENSE_FAILED_MESSAGE = "Failed to add expense, please check budgets!";
     
     /** The Constant LOGOUT_MESSAGE. */
     public static final String LOGOUT_MESSAGE = "Thank you for using PennyWise!";
