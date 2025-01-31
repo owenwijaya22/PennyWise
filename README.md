@@ -1,6 +1,6 @@
 # PennyWise - Personal Finance Management System
 
-PennyWise was developed to address the growing need for accessible personal finance management, particularly among students and young professionals who are just beginning to manage their finances independently. The project emerged from recognizing several key challenges:
+The project emerged from recognizing several key challenges:
 
 1. Financial Literacy Gap
 
