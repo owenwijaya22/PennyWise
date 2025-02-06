@@ -1,4 +1,4 @@
-# PennyWise - Personal Finance Management System
+# PennyWise - Personal Finance Management System with Discount & Coupon Integrations 
 
 The project emerged from recognizing several key challenges:
 
