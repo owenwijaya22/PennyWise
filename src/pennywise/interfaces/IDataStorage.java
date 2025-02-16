@@ -6,6 +6,7 @@ package pennywise.interfaces;
 import java.util.List;
 import pennywise.model.User;
 import pennywise.model.Budget;
+import pennywise.model.Discount;
 import pennywise.model.Transaction;
 
 
@@ -92,4 +93,5 @@ public interface IDataStorage {
      * @return the list
      */
     List<Budget> loadBudgets(String userId);
+	
 }
